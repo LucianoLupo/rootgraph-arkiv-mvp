@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 10%;
+    --foreground: 0 0% 100%;
+    --card: 240 5% 17%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 5% 17%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 15 99% 63%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 237 76% 38%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 4% 14%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 15 99% 63%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 15 99% 63%;
+    --chart-1: 15 99% 63%;
+    --chart-2: 237 76% 38%;
+    --chart-3: 0 0% 30%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'IBM Plex Mono', var(--font-geist-mono), monospace;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'IBM Plex Mono', var(--font-geist-mono), monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
