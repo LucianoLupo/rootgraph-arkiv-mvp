@@ -10,6 +10,7 @@ import {
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { createArkivWalletClient } from '@/lib/arkiv'
 import { useAppStore } from '@/lib/store'
+import type { Hex } from '@arkiv-network/sdk'
 
 
 type ArkivWalletClient = ReturnType<typeof createArkivWalletClient>
@@ -56,8 +57,10 @@ export function ArkivProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      // Switch to Kaolin chain before getting the provider
+      await wallet.switchChain(60138453025)
       const provider = await wallet.getEthereumProvider()
-      const client = createArkivWalletClient(provider)
+      const client = createArkivWalletClient(provider, wallet.address as Hex)
       setWalletClient(client)
       setWalletAddress(wallet.address)
     } catch (err) {

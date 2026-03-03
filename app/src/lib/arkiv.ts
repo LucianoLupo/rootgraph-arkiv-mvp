@@ -156,8 +156,9 @@ export function getArkivPublicClient() {
   return publicClientInstance
 }
 
-export function createArkivWalletClient(provider: EIP1193Provider) {
+export function createArkivWalletClient(provider: EIP1193Provider, address: Hex) {
   return createWalletClient({
+    account: address,
     chain: kaolin,
     transport: custom(provider),
   })
