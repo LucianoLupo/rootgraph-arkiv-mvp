@@ -9,6 +9,7 @@ import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { truncateWallet } from '@/lib/utils';
+import { KaolinSetupModal } from '@/components/kaolin-setup-modal';
 import {
   LayoutDashboard,
   Users,
@@ -20,6 +21,7 @@ import {
   LogIn,
   Menu,
   Loader2,
+  HelpCircle,
 } from 'lucide-react';
 
 const navItems = [
@@ -42,11 +44,13 @@ function SidebarContent({
   onNavigate,
   identity,
   onLogout,
+  onNetworkSetup,
 }: {
   pathname: string;
   onNavigate: (href: string) => void;
   identity: string;
   onLogout: () => void;
+  onNetworkSetup: () => void;
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -86,6 +90,14 @@ function SidebarContent({
         <div className="h-px bg-[#333] mb-3" />
         <Button
           variant="ghost"
+          className="w-full justify-start text-[#A0A0A0] hover:text-[#FE7445] hover:bg-[#FE7445]/10 text-xs font-bold tracking-wider"
+          onClick={onNetworkSetup}
+        >
+          <HelpCircle className="w-4 h-4 mr-3" />
+          NETWORK SETUP
+        </Button>
+        <Button
+          variant="ghost"
           className="w-full justify-start text-[#A0A0A0] hover:text-red-400 hover:bg-red-500/10 text-xs font-bold tracking-wider"
           onClick={onLogout}
         >
@@ -109,6 +121,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [setupModalOpen, setSetupModalOpen] = useState(false);
 
   const { ready, authenticated, logout, login, user } = usePrivy();
   const { isReady } = useArkiv();
@@ -201,6 +214,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
           onNavigate={handleNavigate}
           identity={identity}
           onLogout={handleLogout}
+          onNetworkSetup={() => setSetupModalOpen(true)}
         />
       </aside>
 
@@ -225,6 +239,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                 onNavigate={handleNavigate}
                 identity={identity}
                 onLogout={handleLogout}
+                onNetworkSetup={() => { setSheetOpen(false); setSetupModalOpen(true); }}
               />
             </SheetContent>
           </Sheet>
@@ -235,6 +250,12 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
       <main className="flex-1 min-h-screen md:pt-0 pt-14 overflow-y-auto">
         {children}
       </main>
+
+      <KaolinSetupModal
+        open={setupModalOpen}
+        onOpenChange={setSetupModalOpen}
+        walletAddress={walletAddress ?? undefined}
+      />
     </div>
   );
 }

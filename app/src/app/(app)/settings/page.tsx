@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { KaolinSetupModal } from '@/components/kaolin-setup-modal';
 import { Save, Loader2, CheckCircle, X, UserPlus, ExternalLink } from 'lucide-react';
 import type { Hex } from '@arkiv-network/sdk';
 
@@ -60,6 +61,7 @@ export default function SettingsPage() {
   }, [profile]);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [setupModalOpen, setSetupModalOpen] = useState(false);
   const [usernameChecking, setUsernameChecking] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
 
@@ -142,7 +144,17 @@ export default function SettingsPage() {
       }
     } catch (err) {
       console.error('Failed to save profile:', err);
-      toast({ title: 'Failed to save profile', variant: 'destructive' });
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.toLowerCase().includes('transaction failed') || message.toLowerCase().includes('insufficient funds')) {
+        setSetupModalOpen(true);
+        toast({
+          title: 'Transaction failed',
+          description: 'You may need to set up the Kaolin network or get testnet ETH.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({ title: 'Failed to save profile', variant: 'destructive' });
+      }
     } finally {
       setIsSaving(false);
     }
@@ -343,6 +355,12 @@ export default function SettingsPage() {
           View on Arkiv Explorer
         </a>
       )}
+
+      <KaolinSetupModal
+        open={setupModalOpen}
+        onOpenChange={setSetupModalOpen}
+        walletAddress={walletAddress ?? undefined}
+      />
     </div>
   );
 }

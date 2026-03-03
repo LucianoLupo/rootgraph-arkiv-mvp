@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { getJobsByPoster, getApplicationsByApplicant, type Job } from '@/lib/arkiv';
@@ -21,6 +21,8 @@ import {
   ExternalLink,
   Plus,
   Settings,
+  Link,
+  Check,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -45,6 +47,16 @@ export default function DashboardPage() {
       setMyJobs(jobs);
       setApplicationCount(apps.length);
     }).catch(() => {});
+  }, [walletAddress]);
+
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyProfileLink = useCallback(() => {
+    if (!walletAddress) return;
+    const url = `${window.location.origin}/profile/${walletAddress}`;
+    navigator.clipboard.writeText(url);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
   }, [walletAddress]);
 
   const pendingCount = incomingRequests.length + outgoingRequests.length;
@@ -123,14 +135,25 @@ export default function DashboardPage() {
                   </Badge>
                 ))}
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4 border-[#444] text-[#A0A0A0] hover:text-white text-xs font-bold tracking-wider"
-                onClick={() => router.push('/settings')}
-              >
-                EDIT PROFILE
-              </Button>
+              <div className="flex gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#444] text-[#A0A0A0] hover:text-white text-xs font-bold tracking-wider"
+                  onClick={() => router.push('/settings')}
+                >
+                  EDIT PROFILE
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#444] text-[#A0A0A0] hover:text-white text-xs font-bold tracking-wider"
+                  onClick={copyProfileLink}
+                >
+                  {linkCopied ? <Check className="w-3.5 h-3.5 mr-1.5 text-[#FE7445]" /> : <Link className="w-3.5 h-3.5 mr-1.5" />}
+                  {linkCopied ? 'COPIED!' : 'SHARE PROFILE'}
+                </Button>
+              </div>
               <a
                 href={`https://explorer.kaolin.hoodi.arkiv.network/address/${profile.wallet}`}
                 target="_blank"
