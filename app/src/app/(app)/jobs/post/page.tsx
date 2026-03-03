@@ -1,17 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useArkiv } from '@/hooks/use-arkiv';
-import { createJob, type JobData } from '@/lib/arkiv';
+import { createJob, getCompanyByWallet, type JobData } from '@/lib/arkiv';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Send, Loader2, X, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Send, Loader2, X, ExternalLink, DollarSign } from 'lucide-react';
 
 const JOB_TAGS = [
   'solidity',
@@ -39,11 +39,25 @@ export default function PostJobPage() {
     company: '',
     location: '',
     description: '',
+    salary: '',
     applyUrl: '',
     tags: [] as string[],
     isRemote: false,
   });
   const [isPosting, setIsPosting] = useState(false);
+
+  useEffect(() => {
+    async function autoFillCompany() {
+      if (!walletAddress) return;
+      try {
+        const company = await getCompanyByWallet(walletAddress);
+        if (company) {
+          setForm((prev) => ({ ...prev, company: prev.company || company.name }));
+        }
+      } catch {}
+    }
+    autoFillCompany();
+  }, [walletAddress]);
 
   const updateField = (field: string, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -76,6 +90,7 @@ export default function PostJobPage() {
         company: form.company,
         location: form.location,
         description: form.description,
+        salary: form.salary,
         applyUrl: form.applyUrl,
         tags: form.tags,
         isRemote: form.isRemote,
@@ -169,6 +184,20 @@ export default function PostJobPage() {
                 />
               </button>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="salary" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+              <DollarSign className="w-3 h-3 inline mr-1.5" />
+              Salary / Compensation
+            </Label>
+            <Input
+              id="salary"
+              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              placeholder="e.g. $120k-$180k, Competitive, Negotiable"
+              value={form.salary}
+              onChange={(e) => updateField('salary', e.target.value)}
+            />
           </div>
 
           <div className="h-px bg-[#333]" />

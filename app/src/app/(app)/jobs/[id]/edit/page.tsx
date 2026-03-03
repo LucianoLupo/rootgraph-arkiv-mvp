@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Loader2, X, ExternalLink, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, X, ExternalLink, CheckCircle, DollarSign } from 'lucide-react';
 import type { Hex } from '@arkiv-network/sdk';
 
 const JOB_TAGS = [
@@ -52,6 +52,7 @@ export default function EditJobPage() {
     company: '',
     location: '',
     description: '',
+    salary: '',
     applyUrl: '',
     tags: [] as string[],
     isRemote: false,
@@ -78,6 +79,7 @@ export default function EditJobPage() {
           company: job.company,
           location: job.location,
           description: job.description,
+          salary: job.salary || '',
           applyUrl: job.applyUrl || '',
           tags: job.tags || [],
           isRemote: job.isRemote,
@@ -125,6 +127,7 @@ export default function EditJobPage() {
         company: form.company,
         location: form.location,
         description: form.description,
+        salary: form.salary,
         applyUrl: form.applyUrl,
         tags: form.tags,
         isRemote: form.isRemote,
@@ -240,6 +243,20 @@ export default function EditJobPage() {
                 />
               </button>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="salary" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+              <DollarSign className="w-3 h-3 inline mr-1.5" />
+              Salary / Compensation
+            </Label>
+            <Input
+              id="salary"
+              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              placeholder="e.g. $120k-$180k, Competitive, Negotiable"
+              value={form.salary}
+              onChange={(e) => updateField('salary', e.target.value)}
+            />
           </div>
 
           <div className="h-px bg-[#333]" />

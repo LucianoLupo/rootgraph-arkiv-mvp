@@ -18,6 +18,8 @@ const PROFILE_EXPIRY = ExpirationTime.fromYears(2)
 const CONNECTION_EXPIRY = ExpirationTime.fromYears(2)
 const REQUEST_EXPIRY = ExpirationTime.fromDays(30)
 const JOB_EXPIRY = ExpirationTime.fromDays(90)
+const COMPANY_EXPIRY = ExpirationTime.fromYears(2)
+const FLAG_EXPIRY = ExpirationTime.fromYears(2)
 
 // --- Validation ---
 
@@ -41,10 +43,21 @@ export function validateJobFields(data: JobData) {
   if (data.company.length > 100) throw new Error('Company must be 100 characters or less.')
   if (data.location.length > 100) throw new Error('Location must be 100 characters or less.')
   if (data.description.length > 2000) throw new Error('Description must be 2000 characters or less.')
+  if (data.salary && data.salary.length > 100) throw new Error('Salary must be 100 characters or less.')
   if (data.tags.length > 10) throw new Error('Maximum 10 tags allowed.')
   if (data.applyUrl && !isValidUrl(data.applyUrl)) {
     throw new Error('Apply URL must be a valid http or https URL.')
   }
+}
+
+export function validateCompanyFields(data: CompanyData) {
+  if (!data.name.trim()) throw new Error('Company name is required.')
+  if (data.name.length > 100) throw new Error('Company name must be 100 characters or less.')
+  if (data.description.length > 1000) throw new Error('Description must be 1000 characters or less.')
+  if (data.website && !isValidUrl(data.website)) {
+    throw new Error('Website must be a valid http or https URL.')
+  }
+  if (data.tags.length > 10) throw new Error('Maximum 10 tags allowed.')
 }
 
 export function validateUsername(username: string): {
@@ -119,10 +132,36 @@ export type JobData = {
   company: string
   location: string
   description: string
+  salary: string
   tags: string[]
   isRemote: boolean
   applyUrl: string
   postedAt: string
+}
+
+export type CompanyData = {
+  name: string
+  description: string
+  website: string
+  logoUrl: string
+  tags: string[]
+  createdAt: string
+}
+
+export type Company = CompanyData & {
+  entityKey: string
+  wallet: string
+}
+
+export type FlagData = {
+  jobEntityKey: string
+  reason: string
+  flaggedAt: string
+}
+
+export type Flag = FlagData & {
+  entityKey: string
+  flaggedBy: string
 }
 
 export type Job = JobData & {
@@ -655,6 +694,7 @@ export async function getAllJobs(): Promise<Job[]> {
     return {
       ...data,
       applyUrl: data.applyUrl ?? '',
+      salary: data.salary ?? '',
       entityKey: entity.key,
       postedBy: postedByAttr?.value?.toString() ?? '',
       status: parseJobStatus(entity),
@@ -682,6 +722,7 @@ export async function getJobsByPoster(wallet: string): Promise<Job[]> {
     return {
       ...data,
       applyUrl: data.applyUrl ?? '',
+      salary: data.salary ?? '',
       entityKey: entity.key,
       postedBy: wallet.toLowerCase(),
       status: parseJobStatus(entity),
@@ -700,6 +741,7 @@ export async function getJobByKey(entityKey: string): Promise<Job | null> {
     return {
       ...data,
       applyUrl: data.applyUrl ?? '',
+      salary: data.salary ?? '',
       entityKey: entity.key,
       postedBy: postedByAttr?.value?.toString() ?? '',
       status: parseJobStatus(entity),
@@ -779,4 +821,144 @@ export async function getApplicationsByApplicant(
     const data = entity.toJson() as JobApplicationData
     return { ...data, entityKey: entity.key }
   })
+}
+
+// --- Companies ---
+
+export async function getCompanyByWallet(wallet: string): Promise<Company | null> {
+  const client = getArkivPublicClient()
+  const result = await client
+    .buildQuery()
+    .where([
+      eq('entityType', 'company'),
+      eq('app', APP_TAG),
+      eq('wallet', wallet.toLowerCase()),
+    ])
+    .withPayload(true)
+    .withAttributes(true)
+    .withMetadata(true)
+    .limit(1)
+    .fetch()
+
+  const entity = result.entities[0]
+  if (!entity) return null
+
+  const data = entity.toJson() as CompanyData
+  return {
+    ...data,
+    entityKey: entity.key,
+    wallet: wallet.toLowerCase(),
+  }
+}
+
+export async function createCompany(
+  walletClient: ArkivWalletClient,
+  wallet: string,
+  data: CompanyData
+) {
+  validateCompanyFields(data)
+  const payload = jsonToPayload(data)
+  return walletClient.createEntity({
+    payload,
+    contentType: 'application/json',
+    attributes: [
+      { key: 'entityType', value: 'company' },
+      { key: 'app', value: APP_TAG },
+      { key: 'wallet', value: wallet.toLowerCase() },
+    ],
+    expiresIn: COMPANY_EXPIRY,
+  })
+}
+
+export async function updateCompany(
+  walletClient: ArkivWalletClient,
+  entityKey: Hex,
+  wallet: string,
+  data: CompanyData
+) {
+  validateCompanyFields(data)
+  const payload = jsonToPayload(data)
+  return walletClient.updateEntity({
+    entityKey,
+    payload,
+    contentType: 'application/json',
+    attributes: [
+      { key: 'entityType', value: 'company' },
+      { key: 'app', value: APP_TAG },
+      { key: 'wallet', value: wallet.toLowerCase() },
+    ],
+    expiresIn: COMPANY_EXPIRY,
+  })
+}
+
+// --- Flags ---
+
+export async function flagJob(
+  walletClient: ArkivWalletClient,
+  jobEntityKey: string,
+  wallet: string,
+  reason?: string
+) {
+  const payload = jsonToPayload({
+    jobEntityKey,
+    reason: reason ?? '',
+    flaggedAt: new Date().toISOString(),
+  })
+
+  return walletClient.createEntity({
+    payload,
+    contentType: 'application/json',
+    attributes: [
+      { key: 'entityType', value: 'job-flag' },
+      { key: 'app', value: APP_TAG },
+      { key: 'jobKey', value: jobEntityKey },
+      { key: 'flaggedBy', value: wallet.toLowerCase() },
+    ],
+    expiresIn: FLAG_EXPIRY,
+  })
+}
+
+export async function getFlagsForJob(jobEntityKey: string): Promise<Flag[]> {
+  const client = getArkivPublicClient()
+  const result = await client
+    .buildQuery()
+    .where([
+      eq('entityType', 'job-flag'),
+      eq('app', APP_TAG),
+      eq('jobKey', jobEntityKey),
+    ])
+    .withPayload(true)
+    .withAttributes(true)
+    .withMetadata(true)
+    .limit(200)
+    .fetch()
+
+  return result.entities.map((entity) => {
+    const data = entity.toJson() as FlagData
+    const flaggedByAttr = entity.attributes.find((a) => a.key === 'flaggedBy')
+    return {
+      ...data,
+      entityKey: entity.key,
+      flaggedBy: flaggedByAttr?.value?.toString() ?? '',
+    }
+  })
+}
+
+export async function hasUserFlaggedJob(
+  jobEntityKey: string,
+  wallet: string
+): Promise<boolean> {
+  const client = getArkivPublicClient()
+  const result = await client
+    .buildQuery()
+    .where([
+      eq('entityType', 'job-flag'),
+      eq('app', APP_TAG),
+      eq('jobKey', jobEntityKey),
+      eq('flaggedBy', wallet.toLowerCase()),
+    ])
+    .limit(1)
+    .fetch()
+
+  return result.entities.length > 0
 }

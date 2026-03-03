@@ -8,11 +8,16 @@ import { useAppStore } from '@/lib/store';
 import {
   getJobByKey,
   getProfile,
+  getCompanyByWallet,
   applyToJob,
   getApplicationsByApplicant,
   getApplicationsForJob,
+  flagJob,
+  getFlagsForJob,
+  hasUserFlaggedJob,
   type Job,
   type Profile,
+  type Company,
 } from '@/lib/arkiv';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,6 +36,9 @@ import {
   Pencil,
   Users,
   LogIn,
+  DollarSign,
+  Building2,
+  Flag,
 } from 'lucide-react';
 
 export default function JobDetailPage() {
@@ -45,10 +53,14 @@ export default function JobDetailPage() {
 
   const [job, setJob] = useState<Job | null>(null);
   const [poster, setPoster] = useState<Profile | null>(null);
+  const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasApplied, setHasApplied] = useState(false);
   const [applying, setApplying] = useState(false);
   const [applicationCount, setApplicationCount] = useState(0);
+  const [flagCount, setFlagCount] = useState(0);
+  const [hasFlagged, setHasFlagged] = useState(false);
+  const [flagging, setFlagging] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -58,14 +70,20 @@ export default function JobDetailPage() {
         setJob(jobData);
 
         if (jobData) {
-          const [posterProfile, applications, jobApplications] = await Promise.all([
+          const [posterProfile, applications, jobApplications, companyProfile, flags, userFlagged] = await Promise.all([
             getProfile(jobData.postedBy),
             walletAddress ? getApplicationsByApplicant(walletAddress) : Promise.resolve([]),
             getApplicationsForJob(jobId),
+            getCompanyByWallet(jobData.postedBy),
+            getFlagsForJob(jobId),
+            walletAddress ? hasUserFlaggedJob(jobId, walletAddress) : Promise.resolve(false),
           ]);
           setPoster(posterProfile);
           setHasApplied(applications.some((a) => a.jobEntityKey === jobId));
           setApplicationCount(jobApplications.length);
+          setCompany(companyProfile);
+          setFlagCount(flags.length);
+          setHasFlagged(userFlagged);
         }
       } catch (err) {
         console.error('Failed to load job:', err);
@@ -91,6 +109,23 @@ export default function JobDetailPage() {
       toast({ title: 'Failed to express interest', variant: 'destructive' });
     } finally {
       setApplying(false);
+    }
+  };
+
+  const handleFlag = async () => {
+    if (!authenticated) { login(); return; }
+    if (!walletClient || !walletAddress || !job) return;
+    setFlagging(true);
+    try {
+      await flagJob(walletClient, job.entityKey, walletAddress);
+      setHasFlagged(true);
+      setFlagCount((c) => c + 1);
+      toast({ title: 'Job flagged' });
+    } catch (err) {
+      console.error('Failed to flag job:', err);
+      toast({ title: 'Failed to flag job', variant: 'destructive' });
+    } finally {
+      setFlagging(false);
     }
   };
 
@@ -171,6 +206,12 @@ export default function JobDetailPage() {
                 <Wifi className="w-3 h-3 mr-1" />
                 Remote
               </Badge>
+            )}
+            {job.salary && (
+              <span className="flex items-center gap-1 text-xs text-[#888]">
+                <DollarSign className="w-3.5 h-3.5" />
+                {job.salary}
+              </span>
             )}
             <span className="flex items-center gap-1 text-[10px] text-[#666]">
               <Clock className="w-3 h-3" />
@@ -261,6 +302,32 @@ export default function JobDetailPage() {
                 EXPRESS INTEREST
               </Button>
             ) : null}
+            {authenticated && !isOwnJob && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className={`text-[10px] uppercase tracking-wider ${
+                  hasFlagged
+                    ? 'text-red-400'
+                    : 'text-[#666] hover:text-red-400'
+                }`}
+                disabled={hasFlagged || flagging}
+                onClick={handleFlag}
+              >
+                {flagging ? (
+                  <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                ) : (
+                  <Flag className="w-3 h-3 mr-1" />
+                )}
+                {hasFlagged ? 'FLAGGED' : 'FLAG'}
+              </Button>
+            )}
+            {isOwnJob && flagCount > 0 && (
+              <span className="flex items-center gap-1 text-[10px] text-red-400">
+                <Flag className="w-3 h-3" />
+                {flagCount} flag{flagCount !== 1 && 's'}
+              </span>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -295,6 +362,45 @@ export default function JobDetailPage() {
             {poster.tags && poster.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-3">
                 {poster.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {company && (
+        <Card
+          className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+          onClick={() => router.push(`/company/${job.postedBy}`)}
+        >
+          <CardContent className="py-4">
+            <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-3">
+              Company
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-[#FE7445]/15 flex items-center justify-center shrink-0">
+                <Building2 className="w-5 h-5 text-[#FE7445]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium normal-case">{company.name}</p>
+                {company.description && (
+                  <p className="text-xs text-[#888] normal-case line-clamp-1 mt-0.5">
+                    {company.description}
+                  </p>
+                )}
+              </div>
+            </div>
+            {company.tags && company.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-3">
+                {company.tags.map((tag) => (
                   <Badge
                     key={tag}
                     variant="secondary"

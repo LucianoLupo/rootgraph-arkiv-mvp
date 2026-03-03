@@ -35,6 +35,7 @@ import {
   Users,
   CheckCircle,
   LogIn,
+  DollarSign,
 } from 'lucide-react';
 
 export default function JobsPage() {
@@ -123,6 +124,7 @@ export default function JobsPage() {
     return (
       j.title.toLowerCase().includes(normalizedFilter) ||
       j.company.toLowerCase().includes(normalizedFilter) ||
+      j.description.toLowerCase().includes(normalizedFilter) ||
       j.tags.some((t) => t.toLowerCase().includes(normalizedFilter))
     );
   });
@@ -178,6 +180,12 @@ export default function JobsPage() {
                     <Wifi className="w-3 h-3 mr-1" />
                     Remote
                   </Badge>
+                )}
+                {job.salary && (
+                  <span className="flex items-center gap-1 text-[10px] text-[#666]">
+                    <DollarSign className="w-3 h-3" />
+                    {job.salary}
+                  </span>
                 )}
                 {job.applyUrl && (
                   <a
@@ -296,7 +304,7 @@ export default function JobsPage() {
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666]" />
           <Input
             className="pl-10 bg-[#2A2A2E] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
-            placeholder="FILTER BY TITLE, COMPANY, OR TAG..."
+            placeholder="FILTER BY TITLE, COMPANY, DESCRIPTION, OR TAG..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />

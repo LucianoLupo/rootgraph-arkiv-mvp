@@ -16,6 +16,7 @@ import {
   Map,
   Search,
   Briefcase,
+  Building2,
   Settings,
   LogOut,
   LogIn,
@@ -28,12 +29,13 @@ const navItems = [
   { href: '/dashboard', label: 'DASHBOARD', icon: LayoutDashboard },
   { href: '/connections', label: 'CONNECTIONS', icon: Users },
   { href: '/jobs', label: 'JOBS', icon: Briefcase },
+  { href: '/company', label: 'COMPANY', icon: Building2 },
   { href: '/trustmap', label: 'TRUST MAP', icon: Map },
   { href: '/search', label: 'SEARCH', icon: Search },
   { href: '/settings', label: 'SETTINGS', icon: Settings },
 ];
 
-const PUBLIC_PATHS = ['/jobs'];
+const PUBLIC_PATHS = ['/jobs', '/company'];
 
 function isPublicPath(pathname: string) {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
