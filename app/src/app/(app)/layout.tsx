@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { truncateWallet } from '@/lib/utils';
 import { KaolinSetupModal } from '@/components/kaolin-setup-modal';
+import { ErrorBoundary } from '@/components/error-boundary';
 import {
   LayoutDashboard,
   Users,
@@ -190,7 +191,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
         </header>
-        <main>{children}</main>
+        <main><ErrorBoundary>{children}</ErrorBoundary></main>
       </div>
     );
   }
@@ -250,7 +251,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 min-h-screen md:pt-0 pt-14 overflow-y-auto">
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
       </main>
 
       <KaolinSetupModal

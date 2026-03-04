@@ -4,11 +4,24 @@ RootGraph is a decentralized professional network and job board built on the [Ar
 
 Built for the **Arkiv Web3 Database Builders Challenge 2026**.
 
+## Screenshots
+
+**Landing Page** — The main entry point with feature overview and animated trust graph preview.
+
+![Landing Page](app/public/screenshots/landing.png)
+
+**Job Board** — Browse on-chain job listings with salary, tags, remote filter, and description search.
+
+![Job Board](app/public/screenshots/jobs.png)
+
 ## Features
 
 - **On-Chain Job Board** — Post and discover jobs stored as Arkiv entities. Listings are transparent, censorship-resistant, and queryable by any app.
 - **Trust-Based Hiring** — Hire from your connection graph. Connections are cryptographically verified on-chain.
 - **Decentralized Profiles** — Your professional identity lives on Arkiv. You own it completely.
+- **Company Profiles** — Create and manage company pages with name, description, website, and tags. Publicly viewable by wallet address.
+- **Salary Display** — Job listings include optional salary information for transparency.
+- **Community Flagging** — Flag suspicious job listings for community review with on-chain accountability.
 - **Interactive Trust Map** — Visualize the entire network as a force-directed graph.
 - **Portable Reputation** — Your trust graph is composable. Other apps can read your data directly from Arkiv.
 
@@ -23,8 +36,10 @@ RootGraph stores **all data** as Arkiv entities on the Kaolin testnet (L2 on Hoo
 | `profile` | `wallet`, `username`, `entityType`, `app` | User professional profiles with display name, position, company, tags |
 | `connection` | `userA`, `userB`, `entityType`, `app` | Bidirectional trust connections between wallets |
 | `connection-request` | `fromWallet`, `toWallet`, `status`, `entityType`, `app` | Pending connection requests |
-| `job` | `postedBy`, `status`, `isActive`, `entityType`, `app` | Job postings with title, company, location, description, tags, remote flag |
+| `job` | `postedBy`, `status`, `isActive`, `entityType`, `app` | Job postings with title, company, location, description, tags, salary, remote flag |
 | `job-application` | `jobKey`, `applicantWallet`, `entityType`, `app` | Expressions of interest linking applicants to jobs |
+| `company` | `wallet`, `entityType`, `app` | Company profiles with name, description, website, tags |
+| `job-flag` | `jobKey`, `flaggerWallet`, `entityType`, `app` | Community flags on suspicious job listings |
 
 ### SDK Usage
 
@@ -68,7 +83,7 @@ User Action → Privy Wallet → Arkiv SDK → Kaolin Testnet (on-chain)
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/rootgraph-arkiv-mvp.git
+git clone https://github.com/LucianoLupo/rootgraph-arkiv-mvp.git
 cd rootgraph-arkiv-mvp/app
 
 # Install dependencies
@@ -112,6 +127,8 @@ app/
 │   │       │       └── edit/page.tsx   # Edit job form
 │   │       ├── search/page.tsx         # Search profiles
 │   │       ├── connections/page.tsx    # Manage connections
+│   │       ├── company/page.tsx        # Company profile management
+│   │       ├── company/[wallet]/page.tsx # Public company view
 │   │       ├── profile/[wallet]/       # Public profile view
 │   │       ├── trustmap/page.tsx       # Interactive trust graph
 │   │       └── settings/page.tsx       # Edit own profile
@@ -125,6 +142,7 @@ app/
 │   └── components/ui/                  # shadcn/ui components
 ├── scripts/
 │   ├── seed-demo.ts                    # Demo data seeder
+│   ├── seed-jobs-companies.ts          # Seed companies, jobs, and flags
 │   └── test-jobs.ts                    # Job board integration tests
 └── package.json
 ```

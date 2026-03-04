@@ -340,7 +340,17 @@ export async function searchProfiles(query: string) {
         (a) => a.key === 'username'
       )
       const username = usernameAttr?.value?.toString() ?? ''
-      return username.includes(normalizedQuery)
+      const data = entity.toJson() as ProfileData
+      const displayName = (data.displayName ?? '').toLowerCase()
+      const walletAttr = entity.attributes.find((a) => a.key === 'wallet')
+      const wallet = walletAttr?.value?.toString() ?? ''
+      const tags = (data.tags ?? []).map((t) => t.toLowerCase())
+      return (
+        username.includes(normalizedQuery) ||
+        displayName.includes(normalizedQuery) ||
+        wallet.includes(normalizedQuery) ||
+        tags.some((t) => t.includes(normalizedQuery))
+      )
     })
     .map((entity) => {
       const data = entity.toJson() as ProfileData
@@ -736,6 +746,9 @@ export async function getJobByKey(entityKey: string): Promise<Job | null> {
     const entity = await client.getEntity(entityKey as Hex)
     if (!entity) return null
 
+    const appAttr = entity.attributes.find((a) => a.key === 'app')
+    if (appAttr?.value?.toString() !== APP_TAG) return null
+
     const data = entity.toJson() as JobData
     const postedByAttr = entity.attributes.find((a) => a.key === 'postedBy')
     return {
@@ -746,7 +759,8 @@ export async function getJobByKey(entityKey: string): Promise<Job | null> {
       postedBy: postedByAttr?.value?.toString() ?? '',
       status: parseJobStatus(entity),
     }
-  } catch {
+  } catch (err) {
+    console.error('Failed to fetch job by key:', err)
     return null
   }
 }

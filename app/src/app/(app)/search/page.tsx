@@ -165,7 +165,7 @@ export default function SearchPage() {
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666]" />
           <Input
             className="pl-10 bg-[#2A2A2E] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
-            placeholder="SEARCH BY NAME, WALLET, OR SKILL..."
+            placeholder="SEARCH BY USERNAME, NAME, WALLET, OR TAG..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

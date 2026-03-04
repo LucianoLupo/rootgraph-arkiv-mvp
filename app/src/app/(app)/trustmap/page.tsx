@@ -37,7 +37,9 @@ export default function TrustMapPage() {
   const buildGraphData = useAppStore((s) => s.buildGraphData);
 
   useEffect(() => {
-    buildGraphData();
+    buildGraphData().catch((err) => {
+      console.error('Failed to load graph data:', err);
+    });
   }, [buildGraphData]);
 
   const effectiveGraphData = graphData.nodes.length === 0 && profile && walletAddress

@@ -103,7 +103,7 @@ export default function CompanyPage() {
         website: form.website,
         logoUrl: '',
         tags: form.tags,
-        createdAt: existingKey ? '' : new Date().toISOString(),
+        createdAt: new Date().toISOString(),
       };
 
       if (existingKey) {

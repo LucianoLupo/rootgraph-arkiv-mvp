@@ -46,7 +46,7 @@ export default function DashboardPage() {
     ]).then(([jobs, apps]) => {
       setMyJobs(jobs);
       setApplicationCount(apps.length);
-    }).catch(() => {});
+    }).catch((err) => { console.error('Failed to load dashboard data:', err); });
   }, [walletAddress]);
 
   const [linkCopied, setLinkCopied] = useState(false);
