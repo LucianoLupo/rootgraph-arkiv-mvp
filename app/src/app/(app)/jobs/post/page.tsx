@@ -14,23 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Send, Loader2, X, ExternalLink, DollarSign, Shield, Lock } from 'lucide-react';
-
-const JOB_TAGS = [
-  'solidity',
-  'rust',
-  'typescript',
-  'python',
-  'defi',
-  'nft',
-  'dao',
-  'infrastructure',
-  'frontend',
-  'backend',
-  'fullstack',
-  'design',
-];
-
-const CURRENCIES = ['USD', 'EUR', 'GBP'];
+import { JOB_TAGS, CURRENCIES } from '@/lib/job-constants';
 
 export default function PostJobPage() {
   const router = useRouter();
@@ -80,7 +64,7 @@ export default function PostJobPage() {
     }
   }, [salaryAmount]);
 
-  const updateField = (field: string, value: string | boolean) => {
+  const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 

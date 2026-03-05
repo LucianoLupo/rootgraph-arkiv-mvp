@@ -77,10 +77,12 @@ export default function JobDetailPage() {
   const [decryptedSalary, setDecryptedSalary] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
       setLoading(true);
       try {
         const jobData = await getJobByKey(jobId);
+        if (cancelled) return;
         setJob(jobData);
 
         if (jobData) {
@@ -92,6 +94,7 @@ export default function JobDetailPage() {
             getFlagsForJob(jobId),
             walletAddress ? hasUserFlaggedJob(jobId, walletAddress) : Promise.resolve(false),
           ]);
+          if (cancelled) return;
           setPoster(posterProfile);
           setHasApplied(myApplications.some((a) => a.jobEntityKey === jobId));
           setApplicationCount(jobApplications.length);
@@ -101,13 +104,15 @@ export default function JobDetailPage() {
           setHasFlagged(userFlagged);
         }
       } catch (err) {
+        if (cancelled) return;
         console.error('Failed to load job:', err);
         toast({ title: 'Failed to load job', variant: 'destructive' });
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     load();
+    return () => { cancelled = true; };
   }, [jobId, walletAddress, toast]);
 
   const isOwnJob = walletAddress?.toLowerCase() === job?.postedBy;

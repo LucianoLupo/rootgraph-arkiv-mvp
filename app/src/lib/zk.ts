@@ -1,5 +1,6 @@
 import type { Noir } from '@noir-lang/noir_js'
 import type { BarretenbergBackend } from '@noir-lang/backend_barretenberg'
+import { bytesToBase64, base64ToBytes } from '@/lib/crypto'
 
 let initPromise: Promise<{ noir: Noir; backend: BarretenbergBackend }> | null = null
 
@@ -38,7 +39,7 @@ export async function generateSalaryRangeProof(
   const proofData = await backend.generateProof(witness)
 
   return {
-    proof: uint8ArrayToBase64(proofData.proof),
+    proof: bytesToBase64(proofData.proof),
     publicInputs: JSON.stringify(proofData.publicInputs),
   }
 }
@@ -50,7 +51,7 @@ export async function verifySalaryRangeProof(
   try {
     const { backend } = await initNoir()
 
-    const proofBytes = base64ToUint8Array(proof)
+    const proofBytes = base64ToBytes(proof)
     const inputs = JSON.parse(publicInputs) as string[]
 
     return await backend.verifyProof({
@@ -60,23 +61,6 @@ export async function verifySalaryRangeProof(
   } catch {
     return false
   }
-}
-
-function uint8ArrayToBase64(bytes: Uint8Array): string {
-  let binary = ''
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i])
-  }
-  return btoa(binary)
-}
-
-function base64ToUint8Array(b64: string): Uint8Array {
-  const binary = atob(b64)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i)
-  }
-  return bytes
 }
 
 export function formatSalaryRange(rangeMin: number, rangeMax: number, currency: string): string {

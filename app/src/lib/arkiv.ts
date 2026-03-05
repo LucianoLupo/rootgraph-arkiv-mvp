@@ -182,11 +182,8 @@ export type Job = JobData & {
   status: JobStatus
 }
 
-export type EncryptedMessagePayload = {
-  ciphertext: string
-  nonce: string
-  senderPublicKey: string
-}
+import type { EncryptedPayload } from '@/lib/crypto'
+export type EncryptedMessagePayload = EncryptedPayload
 
 export type JobApplicationData = {
   jobEntityKey: string

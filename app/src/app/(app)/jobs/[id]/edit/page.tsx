@@ -21,23 +21,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save, Loader2, X, ExternalLink, CheckCircle, DollarSign, Shield, Lock } from 'lucide-react';
 import type { Hex } from '@arkiv-network/sdk';
-
-const JOB_TAGS = [
-  'solidity',
-  'rust',
-  'typescript',
-  'python',
-  'defi',
-  'nft',
-  'dao',
-  'infrastructure',
-  'frontend',
-  'backend',
-  'fullstack',
-  'design',
-];
-
-const CURRENCIES = ['USD', 'EUR', 'GBP'];
+import { JOB_TAGS, CURRENCIES } from '@/lib/job-constants';
 
 export default function EditJobPage() {
   const params = useParams();
@@ -73,10 +57,12 @@ export default function EditJobPage() {
   const [salaryRangeMax, setSalaryRangeMax] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
       setLoading(true);
       try {
         const job = await getJobByKey(jobId);
+        if (cancelled) return;
         if (!job) {
           toast({ title: 'Job not found', variant: 'destructive' });
           router.push('/jobs');
@@ -108,14 +94,16 @@ export default function EditJobPage() {
           setSalaryRangeMax(job.salaryData.rangeMax);
         }
       } catch (err) {
+        if (cancelled) return;
         console.error('Failed to load job:', err);
         toast({ title: 'Failed to load job', variant: 'destructive' });
         router.push('/jobs');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     load();
+    return () => { cancelled = true; };
   }, [jobId, walletAddress, router, toast]);
 
   useEffect(() => {
@@ -141,7 +129,7 @@ export default function EditJobPage() {
     }
   }, [salaryAmount, existingSalaryData]);
 
-  const updateField = (field: string, value: string | boolean) => {
+  const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -187,7 +175,7 @@ export default function EditJobPage() {
 
         const encrypted = encryptSalary(amount.toString());
         if (!encrypted) {
-          toast({ title: 'Encryption not available', variant: 'destructive' });
+          toast({ title: 'Encryption not available. Enable encryption in Settings.', variant: 'destructive' });
           setSaving(false);
           setMarkingFilled(false);
           return;

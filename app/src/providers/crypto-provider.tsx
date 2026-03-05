@@ -12,8 +12,8 @@ import {
   deriveEncryptionKeypair,
   deriveSalaryKey,
   signatureToBytes,
-  publicKeyToBase64,
-  base64ToPublicKey,
+  bytesToBase64,
+  base64ToBytes,
 } from '@/lib/crypto'
 
 type CryptoContextType = {
@@ -33,9 +33,9 @@ const SESSION_KEY_PREFIX = 'rg_crypto_'
 
 function cacheKeys(wallet: string, publicKey: Uint8Array, secretKey: Uint8Array, salaryKey: Uint8Array) {
   const data = {
-    publicKey: publicKeyToBase64(publicKey),
-    secretKey: publicKeyToBase64(secretKey),
-    salaryKey: publicKeyToBase64(salaryKey),
+    publicKey: bytesToBase64(publicKey),
+    secretKey: bytesToBase64(secretKey),
+    salaryKey: bytesToBase64(salaryKey),
   }
   sessionStorage.setItem(SESSION_KEY_PREFIX + wallet.toLowerCase(), JSON.stringify(data))
 }
@@ -46,21 +46,24 @@ function loadCachedKeys(wallet: string): { publicKey: Uint8Array; secretKey: Uin
     if (!raw) return null
     const data = JSON.parse(raw)
     return {
-      publicKey: base64ToPublicKey(data.publicKey),
-      secretKey: base64ToPublicKey(data.secretKey),
-      salaryKey: base64ToPublicKey(data.salaryKey),
+      publicKey: base64ToBytes(data.publicKey),
+      secretKey: base64ToBytes(data.secretKey),
+      salaryKey: base64ToBytes(data.salaryKey),
     }
   } catch {
     return null
   }
 }
 
+type KeyState = {
+  publicKey: Uint8Array
+  secretKey: Uint8Array
+  salaryKey: Uint8Array
+}
+
 export function CryptoProvider({ children }: { children: ReactNode }) {
   const { wallets } = useWallets()
-  const [publicKey, setPublicKey] = useState<Uint8Array | null>(null)
-  const [secretKey, setSecretKey] = useState<Uint8Array | null>(null)
-  const [salaryKey, setSalaryKey] = useState<Uint8Array | null>(null)
-  const [publicKeyBase64, setPublicKeyBase64] = useState<string | null>(null)
+  const [keys, setKeys] = useState<KeyState | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
 
   const wallet = wallets[0]
@@ -72,10 +75,8 @@ export function CryptoProvider({ children }: { children: ReactNode }) {
       const keypair = await deriveEncryptionKeypair(sigBytes)
       const salKey = await deriveSalaryKey(sigBytes)
 
-      setPublicKey(keypair.publicKey)
-      setSecretKey(keypair.secretKey)
-      setSalaryKey(salKey)
-      setPublicKeyBase64(publicKeyToBase64(keypair.publicKey))
+      const derived = { publicKey: keypair.publicKey, secretKey: keypair.secretKey, salaryKey: salKey }
+      setKeys(derived)
 
       if (wallet?.address) {
         cacheKeys(wallet.address, keypair.publicKey, keypair.secretKey, salKey)
@@ -86,10 +87,7 @@ export function CryptoProvider({ children }: { children: ReactNode }) {
   }, [wallet?.address])
 
   useEffect(() => {
-    setPublicKey(null)
-    setSecretKey(null)
-    setSalaryKey(null)
-    setPublicKeyBase64(null)
+    setKeys(null)
 
     if (!wallet?.address) {
       setIsInitializing(false)
@@ -98,12 +96,7 @@ export function CryptoProvider({ children }: { children: ReactNode }) {
 
     const cached = loadCachedKeys(wallet.address)
     if (cached) {
-      setPublicKey(cached.publicKey)
-      setSecretKey(cached.secretKey)
-      setSalaryKey(cached.salaryKey)
-      setPublicKeyBase64(publicKeyToBase64(cached.publicKey))
-      setIsInitializing(false)
-      return
+      setKeys(cached)
     }
 
     setIsInitializing(false)
@@ -129,11 +122,11 @@ export function CryptoProvider({ children }: { children: ReactNode }) {
   return (
     <CryptoContext.Provider
       value={{
-        publicKey,
-        secretKey,
-        salaryKey,
-        publicKeyBase64,
-        isEncryptionEnabled: publicKey !== null && secretKey !== null,
+        publicKey: keys?.publicKey ?? null,
+        secretKey: keys?.secretKey ?? null,
+        salaryKey: keys?.salaryKey ?? null,
+        publicKeyBase64: keys ? bytesToBase64(keys.publicKey) : null,
+        isEncryptionEnabled: keys !== null,
         isInitializing,
         promptForSignature,
       }}

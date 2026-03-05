@@ -7,7 +7,7 @@ import {
   decryptFromSender,
   encryptSymmetric,
   decryptSymmetric,
-  base64ToPublicKey,
+  base64ToBytes,
   type EncryptedPayload,
   type SymmetricEncrypted,
 } from '@/lib/crypto'
@@ -30,7 +30,7 @@ export function useCrypto() {
       const profile = await getProfile(recipientWallet)
       if (!profile?.encryptionPublicKey) return null
 
-      const recipientPubKey = base64ToPublicKey(profile.encryptionPublicKey)
+      const recipientPubKey = base64ToBytes(profile.encryptionPublicKey)
       return encryptForRecipient(message, ctx.secretKey, recipientPubKey, context)
     },
     [ctx.secretKey]
@@ -43,7 +43,7 @@ export function useCrypto() {
       context: string
     ): string | null => {
       if (!ctx.secretKey) return null
-      const senderPubKey = base64ToPublicKey(senderPublicKeyBase64)
+      const senderPubKey = base64ToBytes(senderPublicKeyBase64)
       return decryptFromSender(encrypted, ctx.secretKey, senderPubKey, context)
     },
     [ctx.secretKey]

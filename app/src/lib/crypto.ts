@@ -127,11 +127,11 @@ export function decryptSymmetric(encrypted: SymmetricEncrypted, key: Uint8Array)
   }
 }
 
-export function publicKeyToBase64(key: Uint8Array): string {
+export function bytesToBase64(key: Uint8Array): string {
   return encodeBase64(key)
 }
 
-export function base64ToPublicKey(b64: string): Uint8Array {
+export function base64ToBytes(b64: string): Uint8Array {
   return decodeBase64(b64)
 }
 
