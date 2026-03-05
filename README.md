@@ -62,6 +62,30 @@ User Action → Privy Wallet → Arkiv SDK → Kaolin Testnet (on-chain)
                         JSON payload deserialization
 ```
 
+## Privacy Layer
+
+RootGraph includes a full privacy layer for salary encryption, encrypted application messages, and ZK salary range proofs. For the complete technical deep-dive, see **[PRIVACY.md](./PRIVACY.md)**.
+
+### Summary
+
+| Feature | Technique | Status |
+|---------|-----------|--------|
+| **Encrypted Salary** | NaCl `secretbox` (XSalsa20-Poly1305) | Working |
+| **Public Salary Range** | Auto-calculated bracket (e.g., $150k-$200k) | Working |
+| **Encrypted Messages** | NaCl `box` (X25519 ECDHE) | Working |
+| **Key Derivation** | Wallet signature -> HKDF -> NaCl keypair + symmetric key | Working |
+| **ZK Range Proofs** | Noir circuit + Barretenberg SNARK | Compiled, graceful degradation |
+
+- **Key derivation:** User signs a deterministic message -> HKDF derives an X25519 keypair (messaging) and a symmetric key (salary). Keys cached in `sessionStorage`, cleared on tab close.
+- **Encrypted salary:** Exact amount encrypted with secretbox; only the poster can decrypt. A public range bracket is auto-calculated and stored alongside.
+- **ZK proofs:** A Noir circuit proves salary falls within the stated range without revealing the amount. Currently degrades gracefully due to library version constraints.
+- **Encrypted messages:** NaCl box between applicant and poster with context binding. Messages are omitted (never sent in plaintext) if the poster lacks encryption.
+
+### On-Chain Evidence
+
+- **Profile with encryption key:** [explorer](https://explorer.kaolin.hoodi.arkiv.network/entity/0xcde6af5c3fd8073df01a4f8d6a9ba112323d6df5357b1bbd8f8faf1645a555c6)
+- **Job with encrypted salary:** [explorer](https://explorer.kaolin.hoodi.arkiv.network/entity/0xe1dbdd34f8f37fc7271f429d654197536730a12906d56cd911f8a543ae2114e5)
+
 ## Tech Stack
 
 - **Next.js 14** (App Router) — Framework
@@ -131,15 +155,23 @@ app/
 │   │       ├── company/[wallet]/page.tsx # Public company view
 │   │       ├── profile/[wallet]/       # Public profile view
 │   │       ├── trustmap/page.tsx       # Interactive trust graph
-│   │       └── settings/page.tsx       # Edit own profile
+│   │       └── settings/page.tsx       # Edit own profile + encryption
 │   ├── lib/
 │   │   ├── arkiv.ts                    # All Arkiv SDK operations
+│   │   ├── crypto.ts                   # Encryption primitives (HKDF, NaCl)
+│   │   ├── zk.ts                       # ZK proof generation (Noir)
 │   │   ├── store.ts                    # Zustand state management
 │   │   └── utils.ts                    # Utility functions
 │   ├── providers/
-│   │   └── arkiv-provider.tsx          # Wallet client context
-│   ├── hooks/                          # Custom React hooks
+│   │   ├── arkiv-provider.tsx          # Wallet client context
+│   │   └── crypto-provider.tsx         # Encryption key lifecycle
+│   ├── hooks/
+│   │   └── use-crypto.ts              # Encrypt/decrypt consumer hook
 │   └── components/ui/                  # shadcn/ui components
+├── noir/
+│   └── salary_range/src/main.nr        # ZK salary range circuit (Noir)
+├── public/circuits/
+│   └── salary_range.json               # Compiled circuit artifact
 ├── scripts/
 │   ├── seed-demo.ts                    # Demo data seeder
 │   ├── seed-jobs-companies.ts          # Seed companies, jobs, and flags

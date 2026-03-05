@@ -1,0 +1,7 @@
+[package]
+name = "salary_range"
+type = "bin"
+authors = ["RootGraph"]
+compiler_version = ">=0.30.0"
+
+[dependencies]

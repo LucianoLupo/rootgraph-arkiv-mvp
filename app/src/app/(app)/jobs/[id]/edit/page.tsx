@@ -3,42 +3,32 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useArkiv } from '@/hooks/use-arkiv';
+import { useCrypto } from '@/hooks/use-crypto';
 import { useAppStore } from '@/lib/store';
 import {
   getJobByKey,
   updateJob,
   type JobData,
   type JobStatus,
+  type SalaryData,
 } from '@/lib/arkiv';
+import { generateSalaryRangeProof, calculateSalaryRange, formatSalaryRange } from '@/lib/zk';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Loader2, X, ExternalLink, CheckCircle, DollarSign } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, X, ExternalLink, CheckCircle, DollarSign, Shield, Lock } from 'lucide-react';
 import type { Hex } from '@arkiv-network/sdk';
-
-const JOB_TAGS = [
-  'solidity',
-  'rust',
-  'typescript',
-  'python',
-  'defi',
-  'nft',
-  'dao',
-  'infrastructure',
-  'frontend',
-  'backend',
-  'fullstack',
-  'design',
-];
+import { JOB_TAGS, CURRENCIES } from '@/lib/job-constants';
 
 export default function EditJobPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const { walletClient } = useArkiv();
+  const { isEncryptionEnabled, encryptSalary, decryptSalary } = useCrypto();
   const walletAddress = useAppStore((s) => s.walletAddress);
 
   const jobId = params.id as string;
@@ -46,6 +36,7 @@ export default function EditJobPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [markingFilled, setMarkingFilled] = useState(false);
+  const [generatingProof, setGeneratingProof] = useState(false);
   const [currentStatus, setCurrentStatus] = useState<JobStatus>('active');
   const [form, setForm] = useState({
     title: '',
@@ -58,12 +49,20 @@ export default function EditJobPage() {
     isRemote: false,
     postedAt: '',
   });
+  const [existingSalaryData, setExistingSalaryData] = useState<SalaryData | undefined>();
+  const [privateSalary, setPrivateSalary] = useState(false);
+  const [salaryAmount, setSalaryAmount] = useState('');
+  const [salaryCurrency, setSalaryCurrency] = useState('USD');
+  const [salaryRangeMin, setSalaryRangeMin] = useState(0);
+  const [salaryRangeMax, setSalaryRangeMax] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
       setLoading(true);
       try {
         const job = await getJobByKey(jobId);
+        if (cancelled) return;
         if (!job) {
           toast({ title: 'Job not found', variant: 'destructive' });
           router.push('/jobs');
@@ -86,18 +85,51 @@ export default function EditJobPage() {
           postedAt: job.postedAt,
         });
         setCurrentStatus(job.status);
+
+        if (job.salaryData) {
+          setExistingSalaryData(job.salaryData);
+          setPrivateSalary(true);
+          setSalaryCurrency(job.salaryData.currency);
+          setSalaryRangeMin(job.salaryData.rangeMin);
+          setSalaryRangeMax(job.salaryData.rangeMax);
+        }
       } catch (err) {
+        if (cancelled) return;
         console.error('Failed to load job:', err);
         toast({ title: 'Failed to load job', variant: 'destructive' });
         router.push('/jobs');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     load();
+    return () => { cancelled = true; };
   }, [jobId, walletAddress, router, toast]);
 
-  const updateField = (field: string, value: string | boolean) => {
+  useEffect(() => {
+    if (existingSalaryData && isEncryptionEnabled) {
+      const decrypted = decryptSalary({
+        ciphertext: existingSalaryData.encryptedAmount,
+        nonce: existingSalaryData.encryptedNonce,
+      });
+      if (decrypted) {
+        setSalaryAmount(decrypted);
+      }
+    }
+  }, [existingSalaryData, isEncryptionEnabled, decryptSalary]);
+
+  useEffect(() => {
+    if (!existingSalaryData) {
+      const amount = parseInt(salaryAmount, 10);
+      if (!isNaN(amount) && amount > 0) {
+        const range = calculateSalaryRange(amount);
+        setSalaryRangeMin(range.rangeMin);
+        setSalaryRangeMax(range.rangeMax);
+      }
+    }
+  }, [salaryAmount, existingSalaryData]);
+
+  const updateField = <K extends keyof typeof form>(field: K, value: (typeof form)[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -122,16 +154,74 @@ export default function EditJobPage() {
     else setSaving(true);
 
     try {
+      let salaryDisplay = form.salary;
+      let salaryData: SalaryData | undefined = existingSalaryData;
+
+      if (privateSalary && salaryAmount) {
+        const amount = parseInt(salaryAmount, 10);
+        if (isNaN(amount) || amount <= 0) {
+          toast({ title: 'Invalid salary amount', variant: 'destructive' });
+          setSaving(false);
+          setMarkingFilled(false);
+          return;
+        }
+
+        if (salaryRangeMin > salaryRangeMax) {
+          toast({ title: 'Range min must be less than range max', variant: 'destructive' });
+          setSaving(false);
+          setMarkingFilled(false);
+          return;
+        }
+
+        const encrypted = encryptSalary(amount.toString());
+        if (!encrypted) {
+          toast({ title: 'Encryption not available. Enable encryption in Settings.', variant: 'destructive' });
+          setSaving(false);
+          setMarkingFilled(false);
+          return;
+        }
+
+        salaryDisplay = formatSalaryRange(salaryRangeMin, salaryRangeMax, salaryCurrency);
+
+        setGeneratingProof(true);
+        try {
+          const { proof, publicInputs } = await generateSalaryRangeProof(amount, salaryRangeMin, salaryRangeMax);
+          salaryData = {
+            encryptedAmount: encrypted.ciphertext,
+            encryptedNonce: encrypted.nonce,
+            currency: salaryCurrency,
+            rangeMin: salaryRangeMin,
+            rangeMax: salaryRangeMax,
+            zkProof: proof,
+            proofPublicInputs: publicInputs,
+          };
+        } catch {
+          salaryData = {
+            encryptedAmount: encrypted.ciphertext,
+            encryptedNonce: encrypted.nonce,
+            currency: salaryCurrency,
+            rangeMin: salaryRangeMin,
+            rangeMax: salaryRangeMax,
+          };
+          toast({ title: 'Posted without ZK proof', description: 'Salary range is shown but not cryptographically verified.' });
+        } finally {
+          setGeneratingProof(false);
+        }
+      } else if (!privateSalary) {
+        salaryData = undefined;
+      }
+
       const data: JobData = {
         title: form.title,
         company: form.company,
         location: form.location,
         description: form.description,
-        salary: form.salary,
+        salary: salaryDisplay,
         applyUrl: form.applyUrl,
         tags: form.tags,
         isRemote: form.isRemote,
         postedAt: form.postedAt,
+        salaryData,
       };
       await updateJob(walletClient, jobId as Hex, walletAddress, data, status ?? currentStatus);
       toast({ title: isMarkingFilled ? 'Job marked as filled!' : 'Job updated!' });
@@ -246,17 +336,92 @@ export default function EditJobPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="salary" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
-              <DollarSign className="w-3 h-3 inline mr-1.5" />
-              Salary / Compensation
-            </Label>
-            <Input
-              id="salary"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
-              placeholder="e.g. $120k-$180k, Competitive, Negotiable"
-              value={form.salary}
-              onChange={(e) => updateField('salary', e.target.value)}
-            />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="salary" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+                <DollarSign className="w-3 h-3 inline mr-1.5" />
+                Salary / Compensation
+              </Label>
+              {isEncryptionEnabled && (
+                <button
+                  onClick={() => setPrivateSalary(!privateSalary)}
+                  className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase transition-all px-2.5 py-1 rounded-full ${
+                    privateSalary
+                      ? 'bg-green-500/15 text-green-400 border border-green-500/30'
+                      : 'bg-[#333] text-[#A0A0A0] border border-[#444] hover:border-[#666]'
+                  }`}
+                >
+                  {privateSalary ? <Lock className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
+                  {privateSalary ? 'Private' : 'Make Private'}
+                </button>
+              )}
+            </div>
+
+            {privateSalary ? (
+              <div className="space-y-3 bg-[#1A1A1A] rounded-md p-4 border border-green-500/20">
+                <p className="text-[10px] text-green-400 normal-case flex items-center gap-1.5">
+                  <Lock className="w-3 h-3" />
+                  Exact salary encrypted. Only you can see it.
+                </p>
+                <div className="flex gap-3">
+                  <div className="flex-1 space-y-1">
+                    <Label className="text-[10px] text-[#666] uppercase tracking-wider">Exact Amount</Label>
+                    <Input
+                      type="number"
+                      className="bg-[#2A2A2E] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-green-500/30 text-xs"
+                      placeholder="e.g. 150000"
+                      value={salaryAmount}
+                      onChange={(e) => {
+                        setSalaryAmount(e.target.value);
+                        setExistingSalaryData(undefined);
+                      }}
+                    />
+                  </div>
+                  <div className="w-24 space-y-1">
+                    <Label className="text-[10px] text-[#666] uppercase tracking-wider">Currency</Label>
+                    <select
+                      className="w-full h-10 rounded-md bg-[#2A2A2E] border border-[#333] text-white text-xs px-2 focus:outline-none focus:ring-1 focus:ring-green-500/30"
+                      value={salaryCurrency}
+                      onChange={(e) => setSalaryCurrency(e.target.value)}
+                    >
+                      {CURRENCIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                {salaryAmount && !isNaN(parseInt(salaryAmount, 10)) && parseInt(salaryAmount, 10) > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-[10px] text-[#666] uppercase tracking-wider">Public Range</Label>
+                    <div className="flex gap-3">
+                      <Input
+                        type="number"
+                        className="bg-[#2A2A2E] border-[#333] text-white text-xs"
+                        value={salaryRangeMin}
+                        onChange={(e) => setSalaryRangeMin(parseInt(e.target.value, 10) || 0)}
+                      />
+                      <span className="text-[#666] self-center">-</span>
+                      <Input
+                        type="number"
+                        className="bg-[#2A2A2E] border-[#333] text-white text-xs"
+                        value={salaryRangeMax}
+                        onChange={(e) => setSalaryRangeMax(parseInt(e.target.value, 10) || 0)}
+                      />
+                    </div>
+                    <p className="text-[10px] text-[#888] normal-case">
+                      Displayed as: <span className="text-white font-medium">{formatSalaryRange(salaryRangeMin, salaryRangeMax, salaryCurrency)}</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Input
+                id="salary"
+                className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+                placeholder="e.g. $120k-$180k, Competitive, Negotiable"
+                value={form.salary}
+                onChange={(e) => updateField('salary', e.target.value)}
+              />
+            )}
           </div>
 
           <div className="h-px bg-[#333]" />
@@ -343,7 +508,7 @@ export default function EditJobPage() {
               variant="outline"
               className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 font-bold text-xs tracking-wider"
               onClick={() => handleSave('filled')}
-              disabled={markingFilled || saving}
+              disabled={markingFilled || saving || generatingProof}
             >
               {markingFilled ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -358,7 +523,7 @@ export default function EditJobPage() {
               variant="outline"
               className="border-[#FE7445]/30 text-[#FE7445] hover:bg-[#FE7445]/10 font-bold text-xs tracking-wider"
               onClick={() => handleSave('active')}
-              disabled={markingFilled || saving}
+              disabled={markingFilled || saving || generatingProof}
             >
               {markingFilled ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -370,14 +535,14 @@ export default function EditJobPage() {
         <Button
           className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-8"
           onClick={() => handleSave()}
-          disabled={saving || !form.title.trim()}
+          disabled={saving || generatingProof || !form.title.trim()}
         >
-          {saving ? (
+          {saving || generatingProof ? (
             <Loader2 className="w-4 h-4 animate-spin mr-2" />
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          UPDATE JOB
+          {generatingProof ? 'GENERATING PROOF...' : 'UPDATE JOB'}
         </Button>
       </div>
     </div>

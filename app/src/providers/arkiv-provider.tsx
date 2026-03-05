@@ -10,6 +10,7 @@ import {
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { createArkivWalletClient } from '@/lib/arkiv'
 import { useAppStore } from '@/lib/store'
+import { CryptoProvider } from '@/providers/crypto-provider'
 import type { Hex } from '@arkiv-network/sdk'
 
 
@@ -76,7 +77,9 @@ export function ArkivProvider({ children }: { children: ReactNode }) {
 
   return (
     <ArkivContext.Provider value={{ walletClient, isReady }}>
-      {children}
+      <CryptoProvider>
+        {children}
+      </CryptoProvider>
     </ArkivContext.Provider>
   )
 }

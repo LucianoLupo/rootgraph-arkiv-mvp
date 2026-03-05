@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { formatSalaryRange } from '@/lib/zk';
 import {
   Briefcase,
   Plus,
@@ -36,6 +37,8 @@ import {
   CheckCircle,
   LogIn,
   DollarSign,
+  Shield,
+  ShieldAlert,
 } from 'lucide-react';
 
 export default function JobsPage() {
@@ -181,10 +184,18 @@ export default function JobsPage() {
                     Remote
                   </Badge>
                 )}
-                {job.salary && (
+                {(job.salary || job.salaryData) && (
                   <span className="flex items-center gap-1 text-[10px] text-[#666]">
                     <DollarSign className="w-3 h-3" />
-                    {job.salary}
+                    {job.salaryData
+                      ? formatSalaryRange(job.salaryData.rangeMin, job.salaryData.rangeMax, job.salaryData.currency)
+                      : job.salary}
+                    {job.salaryData?.zkProof && (
+                      <span title="ZK Verified range"><Shield className="w-3 h-3 text-green-400/60" /></span>
+                    )}
+                    {job.salaryData && !job.salaryData.zkProof && (
+                      <span title="Unverified range"><ShieldAlert className="w-3 h-3 text-yellow-500/60" /></span>
+                    )}
                   </span>
                 )}
                 {job.applyUrl && (
