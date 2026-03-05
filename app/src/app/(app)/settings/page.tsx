@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { useArkiv } from '@/hooks/use-arkiv';
+import { useCrypto } from '@/hooks/use-crypto';
 import {
   createProfile,
   updateProfile,
@@ -17,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { KaolinSetupModal } from '@/components/kaolin-setup-modal';
-import { Save, Loader2, CheckCircle, X, UserPlus, ExternalLink } from 'lucide-react';
+import { Save, Loader2, CheckCircle, X, UserPlus, ExternalLink, Shield, ShieldOff } from 'lucide-react';
 import type { Hex } from '@arkiv-network/sdk';
 
 const AVAILABLE_TAGS = [
@@ -33,6 +34,7 @@ export default function SettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { walletClient } = useArkiv();
+  const { isEncryptionEnabled, publicKeyBase64, promptForSignature, isInitializing } = useCrypto();
 
   const profile = useAppStore((s) => s.profile);
   const walletAddress = useAppStore((s) => s.walletAddress);
@@ -64,6 +66,7 @@ export default function SettingsPage() {
   const [setupModalOpen, setSetupModalOpen] = useState(false);
   const [usernameChecking, setUsernameChecking] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+  const [enablingEncryption, setEnablingEncryption] = useState(false);
 
   const updateField = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -94,6 +97,19 @@ export default function SettingsPage() {
     }
   }, []);
 
+  const handleEnableEncryption = async () => {
+    setEnablingEncryption(true);
+    try {
+      await promptForSignature();
+      toast({ title: 'Encryption enabled!' });
+    } catch (err) {
+      console.error('Failed to enable encryption:', err);
+      toast({ title: 'Failed to enable encryption', variant: 'destructive' });
+    } finally {
+      setEnablingEncryption(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!walletClient || !walletAddress) {
       toast({ title: 'Wallet not connected', variant: 'destructive' });
@@ -118,6 +134,7 @@ export default function SettingsPage() {
         tags: form.tags,
         avatarUrl: '',
         createdAt: profile?.createdAt || new Date().toISOString(),
+        encryptionPublicKey: publicKeyBase64 || profile?.encryptionPublicKey || undefined,
       };
 
       if (isNewProfile) {
@@ -325,6 +342,62 @@ export default function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Encryption Status */}
+      {!isNewProfile && (
+        <Card className="bg-[#2A2A2E] border-[#333]">
+          <CardHeader>
+            <CardTitle className="text-xs tracking-wider">[ ENCRYPTION ]</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {isEncryptionEnabled ? (
+                  <Shield className="w-5 h-5 text-green-400" />
+                ) : (
+                  <ShieldOff className="w-5 h-5 text-[#666]" />
+                )}
+                <div>
+                  <p className="text-xs font-medium normal-case">
+                    {isEncryptionEnabled ? 'Encryption enabled' : 'Encryption disabled'}
+                  </p>
+                  <p className="text-[10px] text-[#666] normal-case mt-0.5">
+                    {isEncryptionEnabled
+                      ? 'Your messages and salary data can be encrypted'
+                      : 'Sign a message to enable encrypted messaging'}
+                  </p>
+                </div>
+              </div>
+              {!isEncryptionEnabled && !isInitializing && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-[#FE7445]/30 text-[#FE7445] hover:bg-[#FE7445]/10 font-bold text-[10px] tracking-wider"
+                  onClick={handleEnableEncryption}
+                  disabled={enablingEncryption}
+                >
+                  {enablingEncryption ? (
+                    <Loader2 className="w-3 h-3 animate-spin mr-1" />
+                  ) : (
+                    <Shield className="w-3 h-3 mr-1" />
+                  )}
+                  ENABLE
+                </Button>
+              )}
+            </div>
+            {isEncryptionEnabled && publicKeyBase64 && (
+              <div className="bg-[#1A1A1A] rounded-md p-3 border border-[#333]">
+                <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-1">
+                  Public Key
+                </p>
+                <p className="text-[10px] text-[#A0A0A0] font-mono break-all">
+                  {publicKeyBase64}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex items-center justify-between">
         <p className="text-[10px] text-[#666] uppercase tracking-wider">

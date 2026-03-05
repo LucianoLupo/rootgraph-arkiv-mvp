@@ -101,6 +101,7 @@ export type ProfileData = {
   tags: string[]
   avatarUrl: string
   createdAt: string
+  encryptionPublicKey?: string
 }
 
 export type Profile = ProfileData & {
@@ -127,6 +128,16 @@ export type Connection = {
 
 export type JobStatus = 'active' | 'filled' | 'expired'
 
+export type SalaryData = {
+  encryptedAmount: string
+  encryptedNonce: string
+  currency: string
+  rangeMin: number
+  rangeMax: number
+  zkProof?: string
+  proofPublicInputs?: string
+}
+
 export type JobData = {
   title: string
   company: string
@@ -137,6 +148,7 @@ export type JobData = {
   isRemote: boolean
   applyUrl: string
   postedAt: string
+  salaryData?: SalaryData
 }
 
 export type CompanyData = {
@@ -170,11 +182,18 @@ export type Job = JobData & {
   status: JobStatus
 }
 
+export type EncryptedMessagePayload = {
+  ciphertext: string
+  nonce: string
+  senderPublicKey: string
+}
+
 export type JobApplicationData = {
   jobEntityKey: string
   applicantWallet: string
   message: string
   appliedAt: string
+  encryptedMessage?: EncryptedMessagePayload
 }
 
 export type JobApplication = JobApplicationData & {
@@ -389,6 +408,11 @@ export async function getAllProfiles() {
       username: usernameAttr?.value?.toString() ?? '',
     }
   })
+}
+
+export async function getEncryptionPublicKey(wallet: string): Promise<string | null> {
+  const profile = await getProfile(wallet)
+  return profile?.encryptionPublicKey ?? null
 }
 
 // --- Connection Requests ---
@@ -769,14 +793,19 @@ export async function applyToJob(
   walletClient: ArkivWalletClient,
   jobEntityKey: string,
   applicantWallet: string,
-  message?: string
+  message?: string,
+  encryptedMessage?: EncryptedMessagePayload
 ) {
-  const payload = jsonToPayload({
+  const payloadData: JobApplicationData = {
     jobEntityKey,
     applicantWallet: applicantWallet.toLowerCase(),
-    message: message ?? '',
+    message: encryptedMessage ? '[encrypted]' : (message ?? ''),
     appliedAt: new Date().toISOString(),
-  })
+  }
+  if (encryptedMessage) {
+    payloadData.encryptedMessage = encryptedMessage
+  }
+  const payload = jsonToPayload(payloadData)
 
   return walletClient.createEntity({
     payload,

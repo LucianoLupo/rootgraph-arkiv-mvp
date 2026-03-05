@@ -62,6 +62,33 @@ User Action → Privy Wallet → Arkiv SDK → Kaolin Testnet (on-chain)
                         JSON payload deserialization
 ```
 
+## Privacy Layer
+
+RootGraph includes an optional privacy layer for salary encryption and encrypted application messages.
+
+### Key Derivation
+
+When a user enables encryption in Settings, they sign a deterministic message with their wallet. The signature is fed through HKDF to derive:
+
+- **NaCl keypair** (X25519) — for asymmetric encryption of application messages between applicant and poster
+- **Symmetric key** (XSalsa20-Poly1305) — for encrypting exact salary amounts (poster-only decryption)
+
+Keys are cached in `sessionStorage` for the tab lifetime and cleared on close.
+
+### Encrypted Salary
+
+- Exact salary is encrypted with NaCl `secretbox` using the poster's symmetric key
+- A public salary range bracket (e.g., $100k–$150k) is auto-calculated and stored in plaintext
+- Only the job poster can decrypt and view the exact amount
+
+### ZK Salary Range Proofs (Best-Effort)
+
+A Noir circuit (`salary_range`) can generate a zero-knowledge proof that the exact salary falls within the stated range, without revealing the amount. This requires Barretenberg WASM with `SharedArrayBuffer`, which needs COOP/COEP headers that conflict with Privy auth iframes. If proof generation fails, the job posts normally with the encrypted salary and public range — no proof attached.
+
+### Encrypted Application Messages
+
+When both applicant and poster have encryption enabled, application messages are encrypted with NaCl `box` (X25519 + XSalsa20-Poly1305). If the poster hasn't enabled encryption, the message is omitted rather than sent in plaintext.
+
 ## Tech Stack
 
 - **Next.js 14** (App Router) — Framework

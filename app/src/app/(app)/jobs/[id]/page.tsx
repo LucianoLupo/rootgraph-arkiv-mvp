@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { usePrivy } from '@privy-io/react-auth';
 import { useArkiv } from '@/hooks/use-arkiv';
+import { useCrypto } from '@/hooks/use-crypto';
 import { useAppStore } from '@/lib/store';
 import {
   getJobByKey,
@@ -18,7 +19,9 @@ import {
   type Job,
   type Profile,
   type Company,
+  type JobApplication,
 } from '@/lib/arkiv';
+import { verifySalaryRangeProof, formatSalaryRange } from '@/lib/zk';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -39,6 +42,11 @@ import {
   DollarSign,
   Building2,
   Flag,
+  Lock,
+  Shield,
+  ShieldCheck,
+  ShieldAlert,
+  Unlock,
 } from 'lucide-react';
 
 export default function JobDetailPage() {
@@ -47,6 +55,7 @@ export default function JobDetailPage() {
   const { toast } = useToast();
   const { authenticated, login } = usePrivy();
   const { walletClient } = useArkiv();
+  const { isEncryptionEnabled, encryptForWallet, decryptMessage, decryptSalary } = useCrypto();
   const walletAddress = useAppStore((s) => s.walletAddress);
 
   const jobId = params.id as string;
@@ -61,6 +70,11 @@ export default function JobDetailPage() {
   const [flagCount, setFlagCount] = useState(0);
   const [hasFlagged, setHasFlagged] = useState(false);
   const [flagging, setFlagging] = useState(false);
+  const [applicationMessage, setApplicationMessage] = useState('');
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [zkVerified, setZkVerified] = useState<boolean | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [decryptedSalary, setDecryptedSalary] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -70,7 +84,7 @@ export default function JobDetailPage() {
         setJob(jobData);
 
         if (jobData) {
-          const [posterProfile, applications, jobApplications, companyProfile, flags, userFlagged] = await Promise.all([
+          const [posterProfile, myApplications, jobApplications, companyProfile, flags, userFlagged] = await Promise.all([
             getProfile(jobData.postedBy),
             walletAddress ? getApplicationsByApplicant(walletAddress) : Promise.resolve([]),
             getApplicationsForJob(jobId),
@@ -79,8 +93,9 @@ export default function JobDetailPage() {
             walletAddress ? hasUserFlaggedJob(jobId, walletAddress) : Promise.resolve(false),
           ]);
           setPoster(posterProfile);
-          setHasApplied(applications.some((a) => a.jobEntityKey === jobId));
+          setHasApplied(myApplications.some((a) => a.jobEntityKey === jobId));
           setApplicationCount(jobApplications.length);
+          setApplications(jobApplications);
           setCompany(companyProfile);
           setFlagCount(flags.length);
           setHasFlagged(userFlagged);
@@ -95,12 +110,32 @@ export default function JobDetailPage() {
     load();
   }, [jobId, walletAddress, toast]);
 
+  const isOwnJob = walletAddress?.toLowerCase() === job?.postedBy;
+
+  useEffect(() => {
+    if (job?.salaryData && isOwnJob) {
+      const result = decryptSalary({
+        ciphertext: job.salaryData.encryptedAmount,
+        nonce: job.salaryData.encryptedNonce,
+      });
+      setDecryptedSalary(result);
+    }
+  }, [job, decryptSalary, isOwnJob, walletAddress]);
+
   const handleApply = async () => {
     if (!authenticated) { login(); return; }
     if (!walletClient || !walletAddress || !job) return;
     setApplying(true);
     try {
-      await applyToJob(walletClient, job.entityKey, walletAddress);
+      const context = `${job.entityKey}:${walletAddress.toLowerCase()}`;
+      let encryptedMsg = undefined;
+
+      if (isEncryptionEnabled && applicationMessage.trim()) {
+        encryptedMsg = await encryptForWallet(applicationMessage, job.postedBy, context) ?? undefined;
+      }
+
+      const messageToSend = encryptedMsg ? undefined : (isEncryptionEnabled && applicationMessage.trim() ? undefined : applicationMessage || undefined);
+      await applyToJob(walletClient, job.entityKey, walletAddress, messageToSend, encryptedMsg);
       setHasApplied(true);
       setApplicationCount((c) => c + 1);
       toast({ title: 'Interest expressed!' });
@@ -127,6 +162,27 @@ export default function JobDetailPage() {
     } finally {
       setFlagging(false);
     }
+  };
+
+  const handleVerifyProof = async () => {
+    if (!job?.salaryData?.zkProof || !job?.salaryData?.proofPublicInputs) return;
+    setVerifying(true);
+    try {
+      const result = await verifySalaryRangeProof(job.salaryData.zkProof, job.salaryData.proofPublicInputs);
+      setZkVerified(result);
+      toast({ title: result ? 'Salary range verified!' : 'Verification failed' });
+    } catch {
+      setZkVerified(false);
+      toast({ title: 'Verification failed', variant: 'destructive' });
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const decryptApplicationMessage = (app: JobApplication): string | null => {
+    if (!app.encryptedMessage || !isEncryptionEnabled) return null;
+    const context = `${app.jobEntityKey}:${app.applicantWallet}`;
+    return decryptMessage(app.encryptedMessage, app.encryptedMessage.senderPublicKey, context);
   };
 
   if (loading) {
@@ -157,9 +213,47 @@ export default function JobDetailPage() {
     );
   }
 
-  const isOwnJob = walletAddress?.toLowerCase() === job.postedBy;
   const postedDate = new Date(job.postedAt);
   const daysAgo = Math.floor((Date.now() - postedDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  const renderSalaryDisplay = () => {
+    if (job.salaryData) {
+      const rangeText = formatSalaryRange(job.salaryData.rangeMin, job.salaryData.rangeMax, job.salaryData.currency);
+      return (
+        <span className="flex items-center gap-1 text-xs text-[#888]">
+          <DollarSign className="w-3.5 h-3.5" />
+          {isOwnJob && decryptedSalary ? (
+            <span>
+              <span className="text-green-400">{job.salaryData.currency} {parseInt(decryptedSalary).toLocaleString()}</span>
+              <span className="text-[#666] ml-1.5">({rangeText})</span>
+            </span>
+          ) : (
+            rangeText
+          )}
+          {job.salaryData.zkProof ? (
+            zkVerified === true ? (
+              <span title="ZK Verified"><ShieldCheck className="w-3.5 h-3.5 text-green-400 ml-1" /></span>
+            ) : zkVerified === false ? (
+              <span title="Verification failed"><ShieldAlert className="w-3.5 h-3.5 text-red-400 ml-1" /></span>
+            ) : (
+              <span title="ZK proof available"><Shield className="w-3.5 h-3.5 text-green-400/60 ml-1" /></span>
+            )
+          ) : (
+            <span title="Unverified range"><ShieldAlert className="w-3.5 h-3.5 text-yellow-500/60 ml-1" /></span>
+          )}
+        </span>
+      );
+    }
+    if (job.salary) {
+      return (
+        <span className="flex items-center gap-1 text-xs text-[#888]">
+          <DollarSign className="w-3.5 h-3.5" />
+          {job.salary}
+        </span>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
@@ -207,12 +301,7 @@ export default function JobDetailPage() {
                 Remote
               </Badge>
             )}
-            {job.salary && (
-              <span className="flex items-center gap-1 text-xs text-[#888]">
-                <DollarSign className="w-3.5 h-3.5" />
-                {job.salary}
-              </span>
-            )}
+            {renderSalaryDisplay()}
             <span className="flex items-center gap-1 text-[10px] text-[#666]">
               <Clock className="w-3 h-3" />
               {daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}
@@ -229,6 +318,23 @@ export default function JobDetailPage() {
               </Badge>
             )}
           </div>
+
+          {job.salaryData?.zkProof && zkVerified === null && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-green-500/30 text-green-400 hover:bg-green-500/10 text-[10px] uppercase tracking-wider"
+              onClick={handleVerifyProof}
+              disabled={verifying}
+            >
+              {verifying ? (
+                <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+              ) : (
+                <ShieldCheck className="w-3 h-3 mr-1.5" />
+              )}
+              VERIFY SALARY RANGE
+            </Button>
+          )}
 
           {job.tags && job.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -329,8 +435,80 @@ export default function JobDetailPage() {
               </span>
             )}
           </div>
+
+          {/* Application message input for non-owners */}
+          {!isOwnJob && !hasApplied && job.status === 'active' && authenticated && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <textarea
+                  className="w-full rounded-md bg-[#1A1A1A] border border-[#333] text-white placeholder:text-[#666] text-xs p-3 min-h-[60px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FE7445]/30 font-mono"
+                  placeholder="Optional message to the poster..."
+                  value={applicationMessage}
+                  onChange={(e) => setApplicationMessage(e.target.value)}
+                  maxLength={500}
+                />
+              </div>
+              {isEncryptionEnabled && poster?.encryptionPublicKey && (
+                <p className="text-[10px] text-green-400/70 normal-case flex items-center gap-1">
+                  <Lock className="w-3 h-3" />
+                  Your message will be end-to-end encrypted
+                </p>
+              )}
+              {isEncryptionEnabled && !poster?.encryptionPublicKey && applicationMessage && (
+                <p className="text-[10px] text-yellow-500/70 normal-case flex items-center gap-1">
+                  <Unlock className="w-3 h-3" />
+                  Poster has not enabled encryption. Message will be sent in plaintext.
+                </p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Applications (visible to poster) */}
+      {isOwnJob && applications.length > 0 && (
+        <Card className="bg-[#2A2A2E] border-[#333]">
+          <CardContent className="py-4">
+            <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-3">
+              Applications ({applications.length})
+            </p>
+            <div className="space-y-3">
+              {applications.map((app) => {
+                const decrypted = decryptApplicationMessage(app);
+                const displayMessage = decrypted ?? (app.message === '[encrypted]' ? null : app.message);
+                return (
+                  <div key={app.entityKey} className="border border-[#333] rounded-md p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <button
+                        className="text-xs text-[#FE7445] hover:underline font-mono"
+                        onClick={() => router.push(`/profile/${app.applicantWallet}`)}
+                      >
+                        {app.applicantWallet.slice(0, 6)}...{app.applicantWallet.slice(-4)}
+                      </button>
+                      <span className="text-[10px] text-[#666]">
+                        {new Date(app.appliedAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {displayMessage ? (
+                      <div className="flex items-start gap-1.5">
+                        {decrypted && (
+                          <Lock className="w-3 h-3 text-green-400 mt-0.5 shrink-0" />
+                        )}
+                        <p className="text-xs text-[#A0A0A0] normal-case">{displayMessage}</p>
+                      </div>
+                    ) : app.encryptedMessage ? (
+                      <p className="text-xs text-[#666] normal-case flex items-center gap-1.5">
+                        <Lock className="w-3 h-3" />
+                        Encrypted message
+                      </p>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {poster && (
         <Card
