@@ -4,6 +4,13 @@ RootGraph is a decentralized professional network and job board built on the [Ar
 
 Built for the **Arkiv Web3 Database Builders Challenge 2026**.
 
+This is an MVP that brings [RootGraph](https://rootgraph.xyz) ([landing](https://land.rootgraph.xyz/)) on-chain using the Arkiv Network. The original RootGraph is a live professional trust network — this submission reimplements its core features (profiles, connections, job board, trust map) with all data stored as Arkiv entities instead of a traditional database.
+
+### Team
+
+- **Luciano Lupo** — [GitHub](https://github.com/LucianoLupo)
+- **Max** — Co-founder of RootGraph — [GitHub](https://github.com/maxi-ht) · [RootGraph Profile](https://www.rootgraph.xyz/profile/Max)
+
 > **Why on-chain?** Traditional job boards own your data, control your visibility, and can deplatform you at will. RootGraph stores everything as Arkiv entities — your profile, connections, and job history are portable, censorship-resistant, and composable by any app. You own your professional reputation.
 
 ## Screenshots
