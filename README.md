@@ -4,6 +4,8 @@ RootGraph is a decentralized professional network and job board built on the [Ar
 
 Built for the **Arkiv Web3 Database Builders Challenge 2026**.
 
+> **Why on-chain?** Traditional job boards own your data, control your visibility, and can deplatform you at will. RootGraph stores everything as Arkiv entities — your profile, connections, and job history are portable, censorship-resistant, and composable by any app. You own your professional reputation.
+
 ## Screenshots
 
 **Landing Page** — The main entry point with feature overview and animated trust graph preview.
@@ -17,6 +19,8 @@ Built for the **Arkiv Web3 Database Builders Challenge 2026**.
 **Trust Map** — Multi-entity force-directed graph with people (circles), companies (rounded squares), and jobs (diamonds). Click any node for a type-aware detail panel. Filter by node type, view stats, and apply to jobs directly from the graph.
 
 ![Trust Map](app/public/screenshots/trustmap.png)
+
+> Demo data is seeded on Kaolin testnet — connect a wallet and explore immediately. Run `npm run seed` to repopulate if needed.
 
 ## Features
 
