@@ -29,13 +29,13 @@ rootgraph-arkiv-mvp/
 │   │   │       ├── layout.tsx         # App layout (ArkivProvider + sidebar + auth guard)
 │   │   │       ├── dashboard/page.tsx
 │   │   │       ├── connections/page.tsx
-│   │   │       ├── trustmap/page.tsx
+│   │   │       ├── trustmap/page.tsx   # Multi-entity graph (people + companies + jobs)
 │   │   │       ├── search/page.tsx
 │   │   │       ├── settings/page.tsx
 │   │   │       └── profile/[wallet]/page.tsx
 │   │   ├── lib/
-│   │   │   ├── arkiv.ts           # ★ Core: all Arkiv SDK interactions (683 lines)
-│   │   │   ├── store.ts           # Zustand store (190 lines)
+│   │   │   ├── arkiv.ts           # ★ Core: all Arkiv SDK interactions
+│   │   │   ├── store.ts           # Zustand store + graph types + computeGraphData
 │   │   │   └── utils.ts           # Shared utilities (truncateWallet, cn)
 │   │   ├── providers/
 │   │   │   ├── privy-provider.tsx  # Privy auth (wallet + Google login)
@@ -115,7 +115,9 @@ This is the most important file. All blockchain interactions go through here.
 | `logActivity()` | async | Create activity entity |
 | `getActivity()` | async | Fetch activity for a wallet |
 | `getRecentActivity()` | async | Fetch recent global activity |
-| `fetchGraphData()` | async | Fetch all connections + profiles for graph visualization |
+| `getAllCompanies()` | async | Fetch all company entities (limit 200) |
+| `getAllJobs()` | async | Fetch all job entities (limit 200) |
+| `fetchGraphData()` | async | Fetch all profiles, connections, companies, and jobs (4 parallel queries) |
 
 ### Types
 
@@ -143,9 +145,9 @@ type ActivityEntry = {
 ### Entity Design on Arkiv
 
 Each data type maps to an Arkiv entity with:
-- **entityType** attribute: `"profile"` | `"connection-request"` | `"connection"` | `"activity"`
+- **entityType** attribute: `"profile"` | `"connection-request"` | `"connection"` | `"activity"` | `"job"` | `"company"` | `"job-application"` | `"job-flag"`
 - **app** attribute: `"rootgraph"` (namespace to avoid collisions)
-- **TTLs**: profiles 2yr, connections 2yr, requests 30d, activity 90d
+- **TTLs**: profiles 2yr, connections 2yr, requests 30d, activity 90d, jobs 90d, applications 90d
 - **Payload**: JSON-serialized data (ProfileData, etc.)
 - **String/numeric attributes**: indexed for queries (wallet, username, fromWallet, toWallet, etc.)
 
@@ -153,7 +155,21 @@ Connection model: `userA` = lexicographically smaller wallet, `userB` = larger. 
 
 ## Key File: `src/lib/store.ts`
 
-Zustand store with all app state.
+Zustand store with all app state. Contains discriminated union types for multi-entity graph nodes.
+
+### Graph Node Types (discriminated union)
+
+```typescript
+type PersonGraphNode  = { nodeType: 'person'; id: string; wallet: string; displayName: string; ... }
+type CompanyGraphNode = { nodeType: 'company'; id: string; wallet: string; name: string; jobCount: number; ... }
+type JobGraphNode     = { nodeType: 'job'; id: string; entityKey: string; title: string; companyName: string; ... }
+type GraphNode = PersonGraphNode | CompanyGraphNode | JobGraphNode
+
+type GraphLink = { source: string; target: string; linkType: 'connection' | 'posted-job' }
+type NodeFilters = { showPeople: boolean; showCompanies: boolean; showJobs: boolean }
+```
+
+Node ID prefix scheme: Person = wallet address, Company = `company:${wallet}`, Job = `job:${entityKey}`.
 
 ### State
 
@@ -167,14 +183,21 @@ Zustand store with all app state.
 | `incomingRequests` | `ConnectionRequest[]` | Pending requests TO user |
 | `outgoingRequests` | `ConnectionRequest[]` | Pending requests FROM user |
 | `requestsLoading` | `boolean` | |
-| `graphData` | `{ nodes, links }` | For react-force-graph-2d |
+| `graphData` | `{ nodes: GraphNode[], links: GraphLink[] }` | For react-force-graph-2d |
+| `graphLoading` | `boolean` | Loading state for graph data |
+| `rawGraphEntities` | `RawGraphEntities \| null` | Cached raw data for instant re-filtering |
+| `nodeFilters` | `NodeFilters` | Toggle visibility of people/companies/jobs |
 | `profileMap` | `Map<string, ProfileMapEntry>` | wallet → { displayName, position, username } |
 | `error` | `string \| null` | Last error message |
 
 ### Actions
 - `fetchProfile(wallet)` / `fetchConnections(wallet)` / `fetchRequests(wallet)`
-- `buildGraphData()` — fetches all connections + profiles, builds graph nodes/links + profileMap
+- `buildGraphData()` — fetches all profiles, connections, companies, and jobs (4 parallel queries), builds graph via `computeGraphData()` pure function
+- `setNodeFilter(filter)` — re-computes graph from cached raw data without network calls
 - `refreshAll()` — calls all fetch + buildGraphData
+
+### `computeGraphData()` Pure Function
+Extracted from `buildGraphData`. Takes `rawGraphEntities` + `nodeFilters`, returns `{ nodes, links }`. Builds person nodes (circles), company nodes (rounded squares), job nodes (diamonds), connection edges (solid), and posted-job edges (dashed). Company→job edges fall back to person→job when company filter is off.
 
 ## Arkiv SDK Quick Reference
 

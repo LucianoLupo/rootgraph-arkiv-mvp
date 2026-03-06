@@ -14,6 +14,10 @@ Built for the **Arkiv Web3 Database Builders Challenge 2026**.
 
 ![Job Board](app/public/screenshots/jobs.png)
 
+**Trust Map** — Multi-entity force-directed graph with people (circles), companies (rounded squares), and jobs (diamonds). Click any node for a type-aware detail panel. Filter by node type, view stats, and apply to jobs directly from the graph.
+
+![Trust Map](app/public/screenshots/trustmap.png)
+
 ## Features
 
 - **On-Chain Job Board** — Post and discover jobs stored as Arkiv entities. Listings are transparent, censorship-resistant, and queryable by any app.
@@ -22,7 +26,8 @@ Built for the **Arkiv Web3 Database Builders Challenge 2026**.
 - **Company Profiles** — Create and manage company pages with name, description, website, and tags. Publicly viewable by wallet address.
 - **Salary Display** — Job listings include optional salary information for transparency.
 - **Community Flagging** — Flag suspicious job listings for community review with on-chain accountability.
-- **Interactive Trust Map** — Visualize the entire network as a force-directed graph.
+- **Multi-Entity Trust Map** — Visualize people, companies, and jobs as a force-directed graph with distinct shapes (circles, rounded squares, diamonds), dashed edge types, sidebar filters, and per-type stats.
+- **Apply from Graph** — Express interest in jobs directly from the Trust Map with one click. Type-aware detail panels show company info, job details with salary, or person profiles.
 - **Portable Reputation** — Your trust graph is composable. Other apps can read your data directly from Arkiv.
 
 ## Arkiv Integration
@@ -49,6 +54,8 @@ RootGraph stores **all data** as Arkiv entities on the Kaolin testnet (L2 on Hoo
 - **`@arkiv-network/sdk/chains`** — `kaolin` chain config (chain ID `60138453025`)
 
 All queries use the `buildQuery()` API with attribute filters. Profiles and connections expire after 2 years; jobs and applications after 90 days; connection requests after 30 days.
+
+The Trust Map builds a multi-entity graph by running 4 parallel queries (`getAllProfiles`, connections, `getAllCompanies`, `getAllJobs`) and computing nodes/links client-side with a pure `computeGraphData()` function. Filters re-compute from cached raw data without additional network calls.
 
 ### Data Flow
 
@@ -154,13 +161,13 @@ app/
 │   │       ├── company/page.tsx        # Company profile management
 │   │       ├── company/[wallet]/page.tsx # Public company view
 │   │       ├── profile/[wallet]/       # Public profile view
-│   │       ├── trustmap/page.tsx       # Interactive trust graph
+│   │       ├── trustmap/page.tsx       # Multi-entity trust graph (people + companies + jobs)
 │   │       └── settings/page.tsx       # Edit own profile + encryption
 │   ├── lib/
 │   │   ├── arkiv.ts                    # All Arkiv SDK operations
 │   │   ├── crypto.ts                   # Encryption primitives (HKDF, NaCl)
 │   │   ├── zk.ts                       # ZK proof generation (Noir)
-│   │   ├── store.ts                    # Zustand state management
+│   │   ├── store.ts                    # Zustand store + graph node types + filter logic
 │   │   └── utils.ts                    # Utility functions
 │   ├── providers/
 │   │   ├── arkiv-provider.tsx          # Wallet client context

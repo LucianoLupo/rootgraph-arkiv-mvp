@@ -1,5 +1,7 @@
 # Master Fix List — RootGraph × Arkiv MVP
 
+> **Status:** All critical fixes complete. Multi-entity trust graph (companies + jobs) shipped. Privacy layer live.
+
 Consolidated from 5 expert reviews. Deduplicated. Ordered by priority then by workstream.
 
 ---

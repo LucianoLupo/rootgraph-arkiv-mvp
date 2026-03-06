@@ -8,7 +8,7 @@
 
 ## The Pitch
 
-> **RootGraph on Arkiv** — A decentralized professional trust graph where users own their connections. No centralized database. Your network lives on-chain, portable across apps, censorship-resistant. Connect your wallet or sign in with Google — either way, you own your data.
+> **RootGraph on Arkiv** — A decentralized professional trust graph and on-chain job board where users own their connections. No centralized database. Your network lives on-chain, portable across apps, censorship-resistant. Connect your wallet or sign in with Google — either way, you own your data. Browse jobs, post company profiles, apply with encrypted messages, and visualize the entire ecosystem in a multi-entity trust graph.
 
 ---
 
@@ -66,14 +66,21 @@ User opens app
 
 ### ❌ Skip (Post-Hackathon)
 
-- Encrypted messaging
+- ~~Encrypted messaging~~ **Done** (NaCl box, context-bound messages)
 - Communities
-- Privacy levels (Selective/Private encryption)
+- ~~Privacy levels (Selective/Private encryption)~~ **Done** (salary encryption, ZK proofs)
 - 2-hop graph / path finding
 - Social link verification
 - Wallet page
-- Settings page beyond basics
+- ~~Settings page beyond basics~~ **Done** (encryption enable, public key display)
 - Entity renewal system
+
+### Bonus: Shipped Beyond Original Scope
+
+- **On-Chain Job Board** — Full CRUD for jobs, applications, company profiles, community flagging
+- **Privacy Layer** — Encrypted salaries (NaCl secretbox), encrypted messages (NaCl box), ZK range proofs (Noir)
+- **Multi-Entity Trust Map** — People, companies, and jobs rendered as distinct shapes with type-aware panels, filters, and apply-from-graph
+- **Company Profiles** — Create/manage company pages with jobs count and public visibility
 
 ---
 
@@ -307,15 +314,22 @@ entityType = "activity" && app = "rootgraph" && actor = "0xMyWallet..."
 
 ## Demo Script (for hackathon judges)
 
-1. **Landing page** — explain the concept: "Own your professional network on-chain"
+1. **Landing page** — explain the concept: "Own your professional network and job board on-chain"
 2. **Login with Google** — show how easy onboarding is (Privy creates wallet behind scenes)
 3. **Create profile** — fill in username, position, company, tags
-4. **Search for another user** — find a pre-created demo user
-5. **Send connection request** — show the tx going to Arkiv
-6. **Switch to second account** — accept the request
-7. **Trust Map** — show the visual graph with the new connection
-8. **Show Arkiv explorer** — prove data lives on-chain (Blockscout)
-9. **Key message**: "No Supabase. No Firebase. Your connections are on Arkiv. Portable. Yours."
+4. **Enable encryption** — one-click signature derives NaCl keys, show public key on profile
+5. **Search for another user** — find a pre-created demo user
+6. **Send connection request** — show the tx going to Arkiv
+7. **Switch to second account** — accept the request
+8. **Job Board** — browse jobs with salary ranges, tags, remote filter
+9. **Post a job with encrypted salary** — enter exact amount, show auto-calculated range, explain ZK proof concept
+10. **Trust Map** — show the multi-entity graph: people (circles), companies (blue squares), jobs (amber diamonds)
+11. **Click a company node** — show detail panel with name, description, job count, website
+12. **Click a job node** — show detail panel with salary, tags, INTERESTED button
+13. **Apply from graph** — one-click express interest directly from the Trust Map
+14. **Toggle filters** — hide/show companies and jobs, watch stats update instantly
+15. **Show Arkiv explorer** — prove encrypted salary ciphertext lives on-chain, exact amount not visible
+16. **Key message**: "No Supabase. No Firebase. Your entire professional network — profiles, connections, jobs, applications, encrypted salaries — all on Arkiv. Portable. Private. Yours."
 
 ---
 
@@ -389,9 +403,11 @@ https://kaolin.hoodi.arkiv.network/explorer/
 
 ## What Makes This Hackathon-Worthy
 
-1. **Novel use of Arkiv** — social graph on decentralized entity storage (not just pastebin/files)
+1. **Novel use of Arkiv** — social graph + job board + privacy layer on decentralized entity storage (not just pastebin/files)
 2. **Real product vision** — RootGraph already exists, this is a credible migration path
 3. **Dual auth** — wallet + Google shows accessibility thinking
-4. **Visual demo** — Trust Map graph is eye-catching for judges
-5. **On-chain proof** — can show data in Blockscout, not just a pretty UI
-6. **Composability angle** — other apps could read the same social graph from Arkiv
+4. **Visual demo** — Multi-entity Trust Map with 3 node shapes, filters, and apply-from-graph is eye-catching
+5. **Privacy layer** — Encrypted salaries (NaCl secretbox), encrypted messages (NaCl box), ZK range proofs (Noir circuit) — all client-side
+6. **On-chain proof** — can show encrypted ciphertext in Arkiv Explorer, prove exact salary is not in plaintext
+7. **Composability angle** — other apps could read the same social graph, job listings, and company profiles from Arkiv
+8. **Depth of integration** — 8 entity types, atomic batch writes, 4-query parallel graph building, attribute-based filtering, TTL management
