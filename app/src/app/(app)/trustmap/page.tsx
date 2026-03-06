@@ -42,8 +42,8 @@ import {
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full bg-[#141414]">
-      <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+    <div className="flex items-center justify-center h-full bg-background">
+      <Loader2 className="w-6 h-6 animate-spin text-foreground" />
     </div>
   ),
 });
@@ -54,18 +54,18 @@ type PositionedNode = GraphNode & { x?: number; y?: number };
 // --- Colors ---
 
 const COLORS = {
-  person: '#FE7445',
-  personOther: '#2A2A2E',
-  company: '#0EA5E9',
-  companyStroke: '#0284C7',
-  jobActive: '#F59E0B',
-  jobActiveStroke: '#D97706',
+  person: '#f3f3f6',
+  personOther: '#1c1c21',
+  company: '#3b82f6',
+  companyStroke: '#2563eb',
+  jobActive: '#f59e0b',
+  jobActiveStroke: '#d97706',
   jobFilled: '#78716C',
   jobFilledStroke: '#57534E',
-  bg: '#141414',
-  stroke: '#444',
-  textMuted: '#A0A0A0',
-  textSubtle: '#666',
+  bg: '#0e0e10',
+  stroke: '#26262c',
+  textMuted: '#f3f3f6',
+  textSubtle: '#848494',
 } as const;
 
 // --- Canvas Paint Helpers ---
@@ -185,19 +185,26 @@ export default function TrustMapPage() {
     (node: PositionedNode, ctx: CanvasRenderingContext2D) => {
       const x = node.x ?? 0;
       const y = node.y ?? 0;
+      ctx.save();
 
       if (node.nodeType === 'person') {
         const isMe = node.id === walletAddress;
-        const radius = isMe ? 10 : 5 + Math.min(node.connectionCount, 5);
+        const radius = isMe ? 18 : 10 + Math.min(node.connectionCount, 5);
 
+        // Fake glow via concentric translucent circles
         if (isMe) {
           ctx.beginPath();
-          ctx.arc(x, y, radius + 6, 0, 2 * Math.PI);
-          ctx.fillStyle = 'rgba(254, 116, 69, 0.15)';
+          ctx.arc(x, y, radius + 10, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(243, 243, 246, 0.08)';
           ctx.fill();
           ctx.beginPath();
-          ctx.arc(x, y, radius + 3, 0, 2 * Math.PI);
-          ctx.fillStyle = 'rgba(254, 116, 69, 0.25)';
+          ctx.arc(x, y, radius + 5, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(243, 243, 246, 0.15)';
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(x, y, radius + 4, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(243, 243, 246, 0.05)';
           ctx.fill();
         }
 
@@ -205,75 +212,89 @@ export default function TrustMapPage() {
         ctx.arc(x, y, radius, 0, 2 * Math.PI);
         ctx.fillStyle = isMe ? COLORS.person : COLORS.personOther;
         ctx.fill();
-        ctx.strokeStyle = isMe ? COLORS.person : COLORS.stroke;
-        ctx.lineWidth = isMe ? 2 : 1;
+        ctx.strokeStyle = isMe ? COLORS.person : 'rgba(243, 243, 246, 0.3)';
+        ctx.lineWidth = isMe ? 2.5 : 1.5;
         ctx.stroke();
 
-        ctx.font = `${isMe ? 'bold ' : ''}${isMe ? 8 : 6}px monospace`;
+        ctx.font = `${isMe ? 'bold ' : ''}${isMe ? 12 : 10}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = isMe ? '#1A1A1A' : COLORS.textMuted;
+        ctx.fillStyle = isMe ? COLORS.bg : COLORS.textMuted;
         const initials = (node.displayName || node.wallet || 'U').slice(0, 2).toUpperCase();
         ctx.fillText(initials, x, y);
 
         if (node.displayName) {
-          ctx.font = '4px monospace';
+          ctx.font = '7px sans-serif';
           ctx.fillStyle = COLORS.textSubtle;
-          ctx.fillText(node.displayName, x, y + radius + 6);
+          ctx.fillText(node.displayName, x, y + radius + 10);
         }
       } else if (node.nodeType === 'company') {
-        const halfSize = 8 + Math.min(node.jobCount, 6) * 1.5;
+        const halfSize = 12 + Math.min(node.jobCount, 6) * 2;
         const cornerRadius = halfSize * 0.3;
+
+        // Fake glow
+        ctx.beginPath();
+        ctx.arc(x, y, halfSize + 4, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.08)';
+        ctx.fill();
 
         drawRoundedRect(ctx, x - halfSize, y - halfSize, halfSize * 2, halfSize * 2, cornerRadius);
         ctx.fillStyle = COLORS.company;
         ctx.fill();
         ctx.strokeStyle = COLORS.companyStroke;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2;
         ctx.stroke();
 
-        ctx.font = 'bold 7px monospace';
+        ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#0C1A2E';
+        ctx.fillStyle = '#fff';
         const initials = (node.name || 'C').slice(0, 2).toUpperCase();
         ctx.fillText(initials, x, y);
 
         if (node.name) {
-          ctx.font = '4px monospace';
+          ctx.font = '7px sans-serif';
           ctx.fillStyle = COLORS.textSubtle;
-          ctx.fillText(node.name.slice(0, 20), x, y + halfSize + 6);
+          ctx.fillText(node.name.slice(0, 20), x, y + halfSize + 10);
         }
       } else if (node.nodeType === 'job') {
-        const size = 7;
+        const size = 10;
         const isFilled = node.status === 'filled';
         const isApplied = appliedJobKeysRef.current.has(node.entityKey);
+
+        // Fake glow
+        ctx.beginPath();
+        ctx.arc(x, y, size + 3, 0, 2 * Math.PI);
+        ctx.fillStyle = isFilled ? 'rgba(120, 113, 108, 0.08)' : 'rgba(245, 158, 11, 0.08)';
+        ctx.fill();
 
         drawDiamond(ctx, x, y, size);
         ctx.fillStyle = isFilled
           ? COLORS.jobFilled
           : isApplied
-            ? 'rgba(254, 116, 69, 0.3)'
+            ? 'rgba(243, 243, 246, 0.3)'
             : COLORS.jobActive;
         ctx.fill();
         ctx.strokeStyle = isFilled ? COLORS.jobFilledStroke : COLORS.jobActiveStroke;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
 
         if (isApplied) {
-          ctx.font = 'bold 6px monospace';
+          ctx.font = 'bold 9px sans-serif';
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
           ctx.fillStyle = COLORS.person;
           ctx.fillText('✓', x, y);
         }
 
-        ctx.font = '3.5px monospace';
+        ctx.font = '6px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = COLORS.textSubtle;
-        ctx.fillText(node.title.slice(0, 18), x, y + size + 5);
+        ctx.fillText(node.title.slice(0, 18), x, y + size + 8);
       }
+
+      ctx.restore();
     },
     [walletAddress]
   );
@@ -285,19 +306,34 @@ export default function TrustMapPage() {
       const tgt = link.target as unknown as PositionedNode;
       if (!src.x || !tgt.x) return;
 
+      const dx = tgt.x - src.x;
+      const dy = tgt.y! - src.y!;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      ctx.save();
       ctx.beginPath();
+      ctx.moveTo(src.x, src.y!);
+
+      if (dist < 0.1) {
+        ctx.lineTo(tgt.x, tgt.y!);
+      } else {
+        const midX = (src.x + tgt.x) / 2;
+        const midY = (src.y! + tgt.y!) / 2;
+        const cpX = midX - dy * 0.15;
+        const cpY = midY + dx * 0.15;
+        ctx.quadraticCurveTo(cpX, cpY, tgt.x, tgt.y!);
+      }
+
       if (link.linkType === 'posted-job') {
         ctx.setLineDash([4, 3]);
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.2)';
+        ctx.lineWidth = 0.5;
       } else {
-        ctx.setLineDash([]);
-        ctx.strokeStyle = 'rgba(254, 116, 69, 0.15)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 0.4;
       }
-      ctx.lineWidth = 1;
-      ctx.moveTo(src.x, src.y!);
-      ctx.lineTo(tgt.x, tgt.y!);
       ctx.stroke();
-      ctx.setLineDash([]);
+      ctx.restore();
     },
     []
   );
@@ -308,7 +344,7 @@ export default function TrustMapPage() {
     const x = node.x ?? 0;
     const y = node.y ?? 0;
     ctx.beginPath();
-    ctx.arc(x, y, 14, 0, 2 * Math.PI);
+    ctx.arc(x, y, 22, 0, 2 * Math.PI);
     ctx.fillStyle = color;
     ctx.fill();
   }, []);
@@ -345,17 +381,17 @@ export default function TrustMapPage() {
   return (
     <div className="h-screen flex flex-col md:flex-row relative">
       {/* Graph Canvas */}
-      <div ref={containerRef} className="flex-1 bg-[#141414] relative">
+      <div ref={containerRef} className="flex-1 relative" style={{ background: 'radial-gradient(ellipse at 50% 50%, #1a1a2e 0%, #0e0e10 70%)' }}>
         {graphLoading ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
-            <Loader2 className="w-8 h-8 animate-spin text-[#FE7445] mb-4" />
-            <p className="text-[10px] text-[#666] uppercase tracking-wider">Loading trust map...</p>
+            <Loader2 className="w-8 h-8 animate-spin text-foreground mb-4" />
+            <p className="text-xs text-muted-foreground">Loading trust map...</p>
           </div>
         ) : showEmptyState ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-6">
-            <Network className="w-12 h-12 text-[#444] mb-4" />
-            <p className="text-[#A0A0A0] font-bold text-xs tracking-wider">NO GRAPH DATA YET</p>
-            <p className="text-[10px] text-[#666] mt-1 normal-case">
+            <Network className="w-12 h-12 text-border mb-4" />
+            <p className="text-muted-foreground font-medium text-sm">No graph data yet</p>
+            <p className="text-xs text-muted-foreground mt-1 normal-case">
               Create your profile and connect with people to see your trust map come alive
             </p>
           </div>
@@ -373,29 +409,29 @@ export default function TrustMapPage() {
             linkCanvasObjectMode={linkMode}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             linkCanvasObject={paintLink as any}
-            backgroundColor="#141414"
-            cooldownTicks={100}
-            d3AlphaDecay={0.025}
-            d3VelocityDecay={0.3}
+            backgroundColor="transparent"
+            cooldownTicks={150}
+            d3AlphaDecay={0.02}
+            d3VelocityDecay={0.25}
           />
         )}
 
         {/* Selected Node Detail Panel */}
         {selectedNode && (
           <div className="absolute top-4 left-4 z-10">
-            <Card className="bg-[#2A2A2E]/95 border-[#333] backdrop-blur-sm w-72">
+            <Card className="bg-card/95 border border-border backdrop-blur-sm w-72">
               <CardContent className="py-3 px-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] text-[#666] uppercase tracking-wider font-bold">
-                    [ {selectedNode.nodeType === 'person'
-                      ? (selectedNode.id === walletAddress ? 'YOU' : 'PERSON')
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {selectedNode.nodeType === 'person'
+                      ? (selectedNode.id === walletAddress ? 'You' : 'Person')
                       : selectedNode.nodeType === 'company'
-                        ? 'COMPANY'
-                        : 'JOB LISTING'} ]
+                        ? 'Company'
+                        : 'Job listing'}
                   </span>
                   <button
                     onClick={() => setSelectedNode(null)}
-                    className="text-[#666] hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -437,40 +473,40 @@ export default function TrustMapPage() {
       </div>
 
       {/* Right Sidebar */}
-      <div className="w-full md:w-64 border-t md:border-t-0 md:border-l border-[#333] bg-[#141414] p-4 space-y-4 shrink-0 overflow-y-auto">
+      <div className="w-full md:w-64 border-t md:border-t-0 md:border-l border-border bg-background p-4 space-y-4 shrink-0 overflow-y-auto">
         <div>
-          <h2 className="text-base font-bold tracking-wider">[ TRUST MAP ]</h2>
-          <p className="text-[10px] text-[#666] normal-case">Your decentralized network graph</p>
+          <h2 className="text-base font-bold">Trust map</h2>
+          <p className="text-xs text-muted-foreground normal-case">Your decentralized network graph</p>
         </div>
 
         {/* Stats */}
-        <Card className="bg-[#2A2A2E] border-[#333]">
+        <Card className="rounded-lg border border-border bg-card">
           <CardContent className="py-3 px-4 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="w-3.5 h-3.5 text-[#FE7445]" />
-                <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider font-bold">People</span>
+                <Users className="w-3.5 h-3.5 text-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">People</span>
               </div>
               <span className="text-sm font-bold">{personCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Building2 className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider font-bold">Companies</span>
+                <Building2 className="w-3.5 h-3.5 text-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Companies</span>
               </div>
               <span className="text-sm font-bold">{companyCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Briefcase className="w-3.5 h-3.5 text-[#F59E0B]" />
-                <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider font-bold">Jobs</span>
+                <Briefcase className="w-3.5 h-3.5 text-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Jobs</span>
               </div>
               <span className="text-sm font-bold">{jobCount}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Link className="w-3.5 h-3.5 text-[#181EA9]" />
-                <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider font-bold">Edges</span>
+                <Link className="w-3.5 h-3.5 text-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Edges</span>
               </div>
               <span className="text-sm font-bold">{edgeCount}</span>
             </div>
@@ -479,23 +515,23 @@ export default function TrustMapPage() {
 
         {/* Filters */}
         <div>
-          <span className="text-[10px] text-[#666] uppercase tracking-wider font-bold">Filters</span>
+          <span className="text-xs text-muted-foreground font-medium">Filters</span>
           <div className="mt-2 space-y-1.5">
             <FilterToggle
               label="People"
-              color="#FE7445"
+              color=""
               active={nodeFilters.showPeople}
               onToggle={() => setNodeFilter({ showPeople: !nodeFilters.showPeople })}
             />
             <FilterToggle
               label="Companies"
-              color="#0EA5E9"
+              color=""
               active={nodeFilters.showCompanies}
               onToggle={() => setNodeFilter({ showCompanies: !nodeFilters.showCompanies })}
             />
             <FilterToggle
               label="Jobs"
-              color="#F59E0B"
+              color=""
               active={nodeFilters.showJobs}
               onToggle={() => setNodeFilter({ showJobs: !nodeFilters.showJobs })}
             />
@@ -504,35 +540,35 @@ export default function TrustMapPage() {
 
         {/* Legend */}
         <div className="pt-2">
-          <span className="text-[10px] text-[#666] uppercase tracking-wider font-bold">Legend</span>
+          <span className="text-xs text-muted-foreground font-medium">Legend</span>
           <div className="mt-2 space-y-2">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#FE7445]" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">You</span>
+              <div className="w-3 h-3 rounded-full bg-foreground" />
+              <span className="text-xs text-muted-foreground">You</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#2A2A2E] border border-[#444]" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">People</span>
+              <div className="w-3 h-3 rounded-full bg-muted border border-border" />
+              <span className="text-xs text-muted-foreground">People</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-sm bg-[#0EA5E9]" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">Companies</span>
+              <div className="w-3 h-3 rounded-sm bg-blue-500" />
+              <span className="text-xs text-muted-foreground">Companies</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rotate-45 bg-[#F59E0B]" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">Jobs</span>
+              <div className="w-3 h-3 rotate-45 bg-amber-500" />
+              <span className="text-xs text-muted-foreground">Jobs</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rotate-45 bg-[#78716C]" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">Filled</span>
+              <div className="w-3 h-3 rotate-45 bg-stone-500" />
+              <span className="text-xs text-muted-foreground">Filled</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-px bg-[#FE7445]/30" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">Trust Link</span>
+              <div className="w-6 h-px bg-foreground/30" />
+              <span className="text-xs text-muted-foreground">Trust link</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-px border-t border-dashed border-[#F59E0B]/50" />
-              <span className="text-[10px] text-[#A0A0A0] uppercase tracking-wider">Posted Job</span>
+              <div className="w-6 h-px border-t border-dashed border-amber-500/50" />
+              <span className="text-xs text-muted-foreground">Posted job</span>
             </div>
           </div>
         </div>
@@ -540,7 +576,7 @@ export default function TrustMapPage() {
         <div className="pt-4 mt-auto">
           <Badge
             variant="outline"
-            className="w-full justify-center border-[#FE7445]/20 text-[#FE7445]/60 bg-[#FE7445]/5 text-[10px] py-1.5 uppercase tracking-wider"
+            className="w-full justify-center border-border text-muted-foreground bg-muted text-xs py-1.5"
           >
             <Network className="w-3 h-3 mr-1.5" />
             Powered by Arkiv
@@ -558,15 +594,15 @@ function FilterToggle({
 }: {
   label: string; color: string; active: boolean; onToggle: () => void;
 }) {
+  void color;
   return (
     <button
       onClick={onToggle}
-      className={`flex items-center gap-2 w-full px-2 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider transition-colors ${
+      className={`flex items-center gap-2 w-full px-2 py-1.5 rounded text-xs font-medium transition-colors ${
         active
-          ? 'bg-opacity-20 text-white'
-          : 'text-[#666] bg-transparent'
+          ? 'bg-muted text-foreground'
+          : 'text-muted-foreground bg-card'
       }`}
-      style={active ? { backgroundColor: `${color}20`, color } : undefined}
     >
       {active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
       {label}
@@ -583,24 +619,24 @@ function PersonDetail({
     <>
       <p className="font-bold text-sm normal-case">{node.displayName || node.wallet.slice(0, 10)}</p>
       {node.position && (
-        <p className="text-[10px] text-[#A0A0A0] mt-0.5 normal-case">
+        <p className="text-xs text-muted-foreground mt-0.5 normal-case">
           {node.position}
           {node.company && ` at ${node.company}`}
         </p>
       )}
       {node.connectionCount > 0 && (
-        <p className="text-[10px] text-[#666] mt-1 normal-case">
+        <p className="text-xs text-muted-foreground mt-1 normal-case">
           {node.connectionCount} connection{node.connectionCount !== 1 ? 's' : ''}
         </p>
       )}
       <Button
         variant="outline"
         size="sm"
-        className="mt-3 w-full border-[#FE7445]/20 text-[#FE7445] text-[10px] uppercase tracking-wider hover:bg-[#FE7445]/10"
+        className="mt-3 w-full border-border text-foreground text-xs font-medium hover:bg-muted"
         onClick={onNavigate}
       >
         <ExternalLink className="w-3 h-3 mr-1.5" />
-        {isCurrentUser ? 'EDIT PROFILE' : 'VIEW PROFILE'}
+        {isCurrentUser ? 'Edit profile' : 'View profile'}
       </Button>
     </>
   );
@@ -614,11 +650,11 @@ function CompanyDetail({
   return (
     <>
       <div className="flex items-center gap-2">
-        <Building2 className="w-4 h-4 text-[#0EA5E9]" />
+        <Building2 className="w-4 h-4 text-blue-500" />
         <p className="font-bold text-sm normal-case">{node.name}</p>
       </div>
       {node.description && (
-        <p className="text-[10px] text-[#A0A0A0] mt-1 normal-case line-clamp-2">
+        <p className="text-xs text-muted-foreground mt-1 normal-case line-clamp-2">
           {node.description}
         </p>
       )}
@@ -631,7 +667,7 @@ function CompanyDetail({
               href={node.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[10px] text-[#0EA5E9] hover:underline mt-1 block normal-case"
+              className="text-xs text-blue-500 hover:underline mt-1 block normal-case"
             >
               {parsed.hostname} ↗
             </a>
@@ -641,7 +677,7 @@ function CompanyDetail({
         }
       })()}
       {node.jobCount > 0 && (
-        <p className="text-[10px] text-[#F59E0B] mt-1 normal-case">
+        <p className="text-xs text-amber-500 mt-1 normal-case">
           {node.jobCount} active job{node.jobCount !== 1 ? 's' : ''}
         </p>
       )}
@@ -651,7 +687,7 @@ function CompanyDetail({
             <Badge
               key={tag}
               variant="secondary"
-              className="bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+              className="bg-blue-500/10 text-blue-500 border border-blue-500/30 text-xs px-1.5 py-0"
             >
               {tag}
             </Badge>
@@ -661,11 +697,11 @@ function CompanyDetail({
       <Button
         variant="outline"
         size="sm"
-        className="mt-3 w-full border-[#0EA5E9]/20 text-[#0EA5E9] text-[10px] uppercase tracking-wider hover:bg-[#0EA5E9]/10"
+        className="mt-3 w-full border-border text-foreground text-xs font-medium hover:bg-muted"
         onClick={onNavigate}
       >
         <ExternalLink className="w-3 h-3 mr-1.5" />
-        VIEW COMPANY
+        View company
       </Button>
     </>
   );
@@ -685,11 +721,11 @@ function JobDetail({
   return (
     <>
       <p className="font-bold text-sm normal-case">{node.title}</p>
-      <p className="text-[10px] text-[#0EA5E9] mt-0.5 normal-case">{node.companyName}</p>
+      <p className="text-xs text-blue-500 mt-0.5 normal-case">{node.companyName}</p>
 
       <div className="flex items-center gap-3 mt-1.5 flex-wrap">
         {node.location && (
-          <span className="flex items-center gap-1 text-[10px] text-[#666]">
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
             <MapPin className="w-3 h-3" />
             {node.location}
           </span>
@@ -697,7 +733,7 @@ function JobDetail({
         {node.isRemote && (
           <Badge
             variant="outline"
-            className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider px-1.5 py-0"
+            className="border-border text-foreground text-xs px-1.5 py-0"
           >
             <Wifi className="w-3 h-3 mr-1" />
             Remote
@@ -706,7 +742,7 @@ function JobDetail({
       </div>
 
       {(node.salary || node.salaryData) && (
-        <span className="flex items-center gap-1 text-[10px] text-[#F59E0B] mt-1">
+        <span className="flex items-center gap-1 text-xs text-amber-500 mt-1">
           <DollarSign className="w-3 h-3" />
           {node.salaryData
             ? formatSalaryRange(node.salaryData.rangeMin, node.salaryData.rangeMax, node.salaryData.currency)
@@ -726,7 +762,7 @@ function JobDetail({
             <Badge
               key={tag}
               variant="secondary"
-              className="bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+              className="bg-amber-500/10 text-amber-500 border border-amber-500/30 text-xs px-1.5 py-0"
             >
               {tag}
             </Badge>
@@ -735,22 +771,22 @@ function JobDetail({
       )}
 
       {node.status === 'filled' ? (
-        <p className="text-[10px] text-[#78716C] mt-3 uppercase tracking-wider font-bold text-center">
-          Position Filled
+        <p className="text-xs text-stone-500 mt-3 font-medium text-center">
+          Position filled
         </p>
       ) : (
         <div className="flex gap-2 mt-3">
           {isOwnJob ? (
             <Badge
               variant="outline"
-              className="flex-1 justify-center border-[#444] text-[#666] text-[10px] uppercase tracking-wider py-1.5"
+              className="flex-1 justify-center border-border text-muted-foreground text-xs py-1.5"
             >
-              Your Job
+              Your job
             </Badge>
           ) : hasApplied ? (
             <Badge
               variant="outline"
-              className="flex-1 justify-center border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider py-1.5"
+              className="flex-1 justify-center border-border text-foreground text-xs py-1.5"
             >
               <Check className="w-3 h-3 mr-1" />
               Interested
@@ -758,7 +794,7 @@ function JobDetail({
           ) : (
             <Button
               size="sm"
-              className="flex-1 bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-[10px] tracking-wider"
+              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-medium text-xs"
               disabled={isApplying}
               onClick={(e) => { e.stopPropagation(); onApply(); }}
             >
@@ -769,17 +805,17 @@ function JobDetail({
               ) : (
                 <Briefcase className="w-3.5 h-3.5 mr-1" />
               )}
-              INTERESTED
+              Interested
             </Button>
           )}
           <Button
             variant="outline"
             size="sm"
-            className="border-[#333] text-[#A0A0A0] text-[10px] uppercase tracking-wider hover:text-white"
+            className="border-border text-muted-foreground text-xs font-medium hover:text-foreground"
             onClick={onNavigate}
           >
             <ExternalLink className="w-3 h-3 mr-1" />
-            DETAILS
+            Details
           </Button>
         </div>
       )}

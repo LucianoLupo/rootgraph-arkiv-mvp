@@ -57,7 +57,7 @@ export default function CompanyProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+        <Loader2 className="w-6 h-6 animate-spin text-foreground" />
       </div>
     );
   }
@@ -67,16 +67,16 @@ export default function CompanyProfilePage() {
       <div className="p-6 lg:p-8 max-w-2xl mx-auto">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-[10px] text-[#666] hover:text-[#FE7445] transition-colors uppercase tracking-wider mb-4"
+          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="w-3 h-3" />
           Back
         </button>
         <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-[#2A2A2E] border border-[#333] flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-8 h-8 text-[#444]" />
+          <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8 text-border" />
           </div>
-          <p className="text-[#A0A0A0] text-sm normal-case">Company profile not found</p>
+          <p className="text-muted-foreground text-sm normal-case">Company profile not found</p>
         </div>
       </div>
     );
@@ -86,17 +86,17 @@ export default function CompanyProfilePage() {
     <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1.5 text-[10px] text-[#666] hover:text-[#FE7445] transition-colors uppercase tracking-wider"
+        className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="w-3 h-3" />
         Back
       </button>
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="bg-card border-border">
         <CardContent className="pt-8 pb-6">
           <div className="flex flex-col items-center text-center">
             <Avatar className="w-20 h-20 mb-4">
-              <AvatarFallback className="bg-[#FE7445]/15 text-[#FE7445] text-2xl font-bold">
+              <AvatarFallback className="bg-primary/15 text-foreground text-2xl font-bold">
                 {company.name.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -108,7 +108,7 @@ export default function CompanyProfilePage() {
                 href={company.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-[#FE7445] hover:text-[#e5673d] transition-colors mt-1"
+                className="flex items-center gap-1 text-xs text-foreground hover:text-foreground/80 transition-colors mt-1"
               >
                 <ExternalLink className="w-3 h-3" />
                 {company.website.replace(/^https?:\/\//, '')}
@@ -116,7 +116,7 @@ export default function CompanyProfilePage() {
             )}
 
             {company.description && (
-              <p className="text-xs text-[#A0A0A0] normal-case mt-4 max-w-md leading-relaxed whitespace-pre-wrap">
+              <p className="text-xs text-muted-foreground normal-case mt-4 max-w-md leading-relaxed whitespace-pre-wrap">
                 {company.description}
               </p>
             )}
@@ -127,7 +127,7 @@ export default function CompanyProfilePage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground border border-foreground/30 text-[10px] "
                   >
                     {tag}
                   </Badge>
@@ -140,25 +140,25 @@ export default function CompanyProfilePage() {
 
       {jobs.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold">
+          <p className="text-sm font-medium text-muted-foreground">
             {jobs.length} active job{jobs.length !== 1 && 's'}
           </p>
           {jobs.map((job) => (
             <Card
               key={job.entityKey}
-              className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+              className="bg-card border-border hover:border-foreground/30 transition-colors cursor-pointer"
               onClick={() => router.push(`/jobs/${job.entityKey}`)}
             >
               <CardContent className="py-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-[#333] flex items-center justify-center shrink-0">
-                    <Briefcase className="w-5 h-5 text-[#A0A0A0]" />
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <Briefcase className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium normal-case">{job.title}</p>
                     <div className="flex items-center gap-3 mt-1.5">
                       {job.location && (
-                        <span className="flex items-center gap-1 text-[10px] text-[#666]">
+                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                           <MapPin className="w-3 h-3" />
                           {job.location}
                         </span>
@@ -166,14 +166,14 @@ export default function CompanyProfilePage() {
                       {job.isRemote && (
                         <Badge
                           variant="outline"
-                          className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider px-1.5 py-0"
+                          className="border-foreground/30 text-foreground text-[10px]  px-1.5 py-0"
                         >
                           <Wifi className="w-3 h-3 mr-1" />
                           Remote
                         </Badge>
                       )}
                       {job.salary && (
-                        <span className="flex items-center gap-1 text-[10px] text-[#666]">
+                        <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                           <DollarSign className="w-3 h-3" />
                           {job.salary}
                         </span>
@@ -185,7 +185,7 @@ export default function CompanyProfilePage() {
                           <Badge
                             key={tag}
                             variant="secondary"
-                            className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                            className="bg-primary/10 text-foreground border border-foreground/30 text-[10px] px-1.5 py-0 "
                           >
                             {tag}
                           </Badge>
@@ -201,10 +201,10 @@ export default function CompanyProfilePage() {
       )}
 
       {jobs.length === 0 && (
-        <Card className="bg-[#2A2A2E] border-[#333]">
+        <Card className="bg-card border-border">
           <CardContent className="py-8 text-center">
-            <Briefcase className="w-8 h-8 text-[#444] mx-auto mb-2" />
-            <p className="text-xs text-[#666] normal-case">No active job listings</p>
+            <Briefcase className="w-8 h-8 text-border mx-auto mb-2" />
+            <p className="text-xs text-muted-foreground normal-case">No active job listings</p>
           </CardContent>
         </Card>
       )}

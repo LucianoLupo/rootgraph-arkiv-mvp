@@ -52,40 +52,40 @@ export default function ConnectionsPage() {
     <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">[ CONNECTIONS ]</h1>
-          <p className="text-[#A0A0A0] text-xs mt-1 normal-case">
+          <h1 className="text-2xl font-bold">Connections</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             Manage your trust network
           </p>
         </div>
         <Button
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
           onClick={() => router.push('/search')}
         >
           <Search className="w-4 h-4 mr-2" />
-          FIND PEOPLE
+          Find people
         </Button>
       </div>
 
       <Tabs defaultValue="connected" className="w-full">
-        <TabsList className="bg-[#2A2A2E] border border-[#333]">
+        <TabsList className="bg-muted border border-border">
           <TabsTrigger
             value="connected"
-            className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-xs font-bold tracking-wider"
+            className="data-[state=active]:bg-border data-[state=active]:text-white text-sm font-medium"
           >
             <Users className="w-4 h-4 mr-2" />
-            CONNECTED
-            <Badge variant="secondary" className="ml-2 bg-[#333] text-[#A0A0A0] text-[10px]">
+            Connected
+            <Badge variant="secondary" className="ml-2 bg-muted text-muted-foreground text-[10px]">
               {connections.length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger
             value="pending"
-            className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-xs font-bold tracking-wider"
+            className="data-[state=active]:bg-border data-[state=active]:text-white text-sm font-medium"
           >
             <Send className="w-4 h-4 mr-2" />
-            PENDING
+            Pending
             {(incomingRequests.length + outgoingRequests.length) > 0 && (
-              <Badge variant="secondary" className="ml-2 bg-[#FE7445]/20 text-[#FE7445] text-[10px]">
+              <Badge variant="secondary" className="ml-2 bg-primary/20 text-foreground text-[10px]">
                 {incomingRequests.length + outgoingRequests.length}
               </Badge>
             )}
@@ -96,14 +96,14 @@ export default function ConnectionsPage() {
         <TabsContent value="connected" className="mt-4 space-y-3">
           {connectionsLoading ? (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+              <Loader2 className="w-6 h-6 animate-spin text-foreground" />
             </div>
           ) : connections.length === 0 ? (
-            <Card className="bg-[#2A2A2E] border-[#333]">
+            <Card className="rounded-lg border border-border bg-card">
               <CardContent className="py-12 text-center">
-                <Users className="w-10 h-10 text-[#444] mx-auto mb-3" />
-                <p className="text-[#A0A0A0] text-sm normal-case">No connections yet</p>
-                <p className="text-xs text-[#666] mt-1 normal-case">
+                <Users className="w-10 h-10 text-border mx-auto mb-3" />
+                <p className="text-muted-foreground text-sm">No connections yet</p>
+                <p className="text-xs text-muted-foreground mt-1">
                   Search for people and start building your trust graph
                 </p>
               </CardContent>
@@ -118,22 +118,22 @@ export default function ConnectionsPage() {
               return (
                 <Card
                   key={conn.entityKey}
-                  className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+                  className="rounded-lg border border-border bg-card hover:border-primary/30 transition-colors cursor-pointer"
                   onClick={() => router.push(`/profile/${otherWallet}`)}
                 >
                   <CardContent className="py-4">
                     <div className="flex items-center gap-4">
                       <Avatar className="w-11 h-11">
-                        <AvatarFallback className="bg-[#FE7445]/10 text-[#FE7445] font-bold text-xs">
+                        <AvatarFallback className="bg-primary/10 text-foreground font-bold text-xs">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium normal-case">{displayName}</p>
-                        <p className="text-xs text-[#666] normal-case">{subtitle}</p>
+                        <p className="font-medium">{displayName}</p>
+                        <p className="text-xs text-muted-foreground">{subtitle}</p>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
-                        <div className="flex items-center gap-1.5 text-[10px] text-[#666]">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
                           {conn.createdAt
                             ? new Date(conn.createdAt).toLocaleDateString('en-US', {
@@ -148,7 +148,7 @@ export default function ConnectionsPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-[#666] hover:text-[#FE7445] transition-colors"
+                          className="text-muted-foreground hover:text-foreground transition-colors"
                           title="View on Arkiv Explorer"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -166,19 +166,19 @@ export default function ConnectionsPage() {
         <TabsContent value="pending" className="mt-4 space-y-6">
           {requestsLoading && (
             <div className="flex justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+              <Loader2 className="w-6 h-6 animate-spin text-foreground" />
             </div>
           )}
           {!requestsLoading && <>
           {/* Incoming */}
           <div>
-            <h3 className="text-xs font-bold text-[#A0A0A0] mb-3 flex items-center gap-2 tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-[#FE7445]" />
-              INCOMING REQUESTS ({incomingRequests.length})
+            <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-foreground" />
+              Incoming requests ({incomingRequests.length})
             </h3>
             {incomingRequests.length === 0 ? (
-              <Card className="bg-[#2A2A2E] border-[#333]">
-                <CardContent className="py-8 text-center text-xs text-[#666] normal-case">
+              <Card className="rounded-lg border border-border bg-card">
+                <CardContent className="py-8 text-center text-xs text-muted-foreground">
                   No incoming requests
                 </CardContent>
               </Card>
@@ -189,18 +189,18 @@ export default function ConnectionsPage() {
                   const fromName = fromProfile?.displayName || fromProfile?.username || truncateWallet(req.from);
                   const fromInitials = (fromProfile?.displayName || req.from.slice(2, 4)).slice(0, 2).toUpperCase();
                   return (
-                  <Card key={req.entityKey} className="bg-[#2A2A2E] border-[#333]">
+                  <Card key={req.entityKey} className="rounded-lg border border-border bg-card">
                     <CardContent className="py-4">
                       <div className="flex items-start gap-4">
                         <Avatar className="w-11 h-11 shrink-0">
-                          <AvatarFallback className="bg-[#FE7445]/10 text-[#FE7445] font-bold text-xs">
+                          <AvatarFallback className="bg-primary/10 text-foreground font-bold text-xs">
                             {fromInitials}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium normal-case">{fromName}</p>
+                          <p className="font-medium">{fromName}</p>
                           {req.message && (
-                            <p className="text-xs text-[#666] mt-1 italic normal-case">
+                            <p className="text-xs text-muted-foreground mt-1 italic">
                               &ldquo;{req.message}&rdquo;
                             </p>
                           )}
@@ -208,7 +208,7 @@ export default function ConnectionsPage() {
                         <div className="flex gap-2 shrink-0">
                           <Button
                             size="sm"
-                            className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-[10px] tracking-wider"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
                             disabled={acceptingFrom === req.from}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -218,7 +218,7 @@ export default function ConnectionsPage() {
                             {acceptingFrom === req.from ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                              <><Check className="w-4 h-4 mr-1" /> ACCEPT</>
+                              <><Check className="w-4 h-4 mr-1" /> Accept</>
                             )}
                           </Button>
                         </div>
@@ -233,13 +233,13 @@ export default function ConnectionsPage() {
 
           {/* Outgoing */}
           <div>
-            <h3 className="text-xs font-bold text-[#A0A0A0] mb-3 flex items-center gap-2 tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-[#181EA9]" />
-              OUTGOING REQUESTS ({outgoingRequests.length})
+            <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-muted-foreground" />
+              Outgoing requests ({outgoingRequests.length})
             </h3>
             {outgoingRequests.length === 0 ? (
-              <Card className="bg-[#2A2A2E] border-[#333]">
-                <CardContent className="py-8 text-center text-xs text-[#666] normal-case">
+              <Card className="rounded-lg border border-border bg-card">
+                <CardContent className="py-8 text-center text-xs text-muted-foreground">
                   No outgoing requests
                 </CardContent>
               </Card>
@@ -250,17 +250,17 @@ export default function ConnectionsPage() {
                   const toName = toProfile?.displayName || toProfile?.username || truncateWallet(req.to);
                   const toInitials = (toProfile?.displayName || req.to.slice(2, 4)).slice(0, 2).toUpperCase();
                   return (
-                  <Card key={req.entityKey} className="bg-[#2A2A2E] border-[#333]">
+                  <Card key={req.entityKey} className="rounded-lg border border-border bg-card">
                     <CardContent className="py-4">
                       <div className="flex items-center gap-4">
                         <Avatar className="w-11 h-11">
-                          <AvatarFallback className="bg-[#181EA9]/10 text-[#181EA9] font-bold text-xs">
+                          <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs">
                             {toInitials}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium normal-case">{toName}</p>
-                          <p className="text-[10px] text-[#666] normal-case">
+                          <p className="font-medium">{toName}</p>
+                          <p className="text-xs text-muted-foreground">
                             Sent {req.createdAt
                               ? new Date(req.createdAt).toLocaleDateString('en-US', {
                                   month: 'short',
@@ -269,7 +269,7 @@ export default function ConnectionsPage() {
                               : 'recently'}
                           </p>
                         </div>
-                        <Badge variant="outline" className="border-[#181EA9]/30 text-[#181EA9] text-[10px] uppercase tracking-wider">
+                        <Badge variant="outline" className="border-border text-muted-foreground text-xs">
                           Pending
                         </Badge>
                       </div>

@@ -141,26 +141,26 @@ export default function JobsPage() {
     return (
       <Card
         key={job.entityKey}
-        className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+        className="rounded-lg border border-border bg-card hover:border-foreground/30 transition-colors cursor-pointer"
         onClick={() => router.push(`/jobs/${job.entityKey}`)}
       >
         <CardContent className="py-4">
           <div className="flex items-start gap-4">
             <Avatar className="w-10 h-10 shrink-0 mt-0.5">
-              <AvatarFallback className="bg-[#333] text-[#A0A0A0] font-bold text-xs">
+              <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs">
                 {(poster?.displayName || job.company || 'J').slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <p className="font-medium normal-case">{job.title}</p>
-              <p className="text-xs text-[#A0A0A0] normal-case mt-0.5">
+              <p className="text-xs text-muted-foreground normal-case mt-0.5">
                 {job.company}
                 {!isMyJobsTab && poster && (
-                  <span className="text-[#666]">
+                  <span className="text-muted-foreground">
                     {' '}
                     &middot; posted by{' '}
                     <span
-                      className="hover:text-[#FE7445] cursor-pointer transition-colors"
+                      className="hover:text-foreground cursor-pointer transition-colors"
                       onClick={(e) => { e.stopPropagation(); router.push(`/profile/${job.postedBy}`); }}
                     >
                       {poster.displayName || poster.username}
@@ -170,7 +170,7 @@ export default function JobsPage() {
               </p>
               <div className="flex items-center gap-3 mt-1.5">
                 {job.location && (
-                  <span className="flex items-center gap-1 text-[10px] text-[#666]">
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                     <MapPin className="w-3 h-3" />
                     {job.location}
                   </span>
@@ -178,14 +178,14 @@ export default function JobsPage() {
                 {job.isRemote && (
                   <Badge
                     variant="outline"
-                    className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider px-1.5 py-0"
+                    className="border-foreground/30 text-foreground text-[10px] px-1.5 py-0"
                   >
                     <Wifi className="w-3 h-3 mr-1" />
                     Remote
                   </Badge>
                 )}
                 {(job.salary || job.salaryData) && (
-                  <span className="flex items-center gap-1 text-[10px] text-[#666]">
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                     <DollarSign className="w-3 h-3" />
                     {job.salaryData
                       ? formatSalaryRange(job.salaryData.rangeMin, job.salaryData.rangeMax, job.salaryData.currency)
@@ -203,7 +203,7 @@ export default function JobsPage() {
                     href={job.applyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[10px] text-[#FE7445] hover:text-[#e5673d] transition-colors"
+                    className="flex items-center gap-1 text-[10px] text-foreground hover:text-foreground/80 transition-colors"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ExternalLink className="w-3 h-3" />
@@ -211,20 +211,20 @@ export default function JobsPage() {
                   </a>
                 )}
                 {isMyJobsTab && appCount > 0 && (
-                  <span className="flex items-center gap-1 text-[10px] text-[#666]">
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                     <Users className="w-3 h-3" />
                     {appCount} interested
                   </span>
                 )}
                 {job.status === 'filled' && (
-                  <Badge variant="outline" className="border-yellow-500/30 text-yellow-500 text-[10px] uppercase tracking-wider px-1.5 py-0">
+                  <Badge variant="outline" className="border-yellow-500/30 text-yellow-500 text-[10px] px-1.5 py-0">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Filled
                   </Badge>
                 )}
               </div>
               {job.description && (
-                <p className="text-xs text-[#888] mt-2 normal-case line-clamp-2">
+                <p className="text-xs text-muted-foreground mt-2 normal-case line-clamp-2">
                   {job.description}
                 </p>
               )}
@@ -234,7 +234,7 @@ export default function JobsPage() {
                     <Badge
                       key={tag}
                       variant="secondary"
-                      className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                      className="bg-primary/10 text-foreground border border-foreground/30 text-[10px] px-1.5 py-0"
                     >
                       {tag}
                     </Badge>
@@ -247,7 +247,7 @@ export default function JobsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#444] text-[#A0A0A0] text-[10px] uppercase tracking-wider"
+                  className="border-border text-muted-foreground text-sm font-medium"
                   onClick={() => router.push(`/jobs/${job.entityKey}/edit`)}
                 >
                   <Pencil className="w-3 h-3 mr-1" />
@@ -256,14 +256,14 @@ export default function JobsPage() {
               ) : isOwnJob ? (
                 <Badge
                   variant="outline"
-                  className="border-[#444] text-[#666] text-[10px] uppercase tracking-wider"
+                  className="border-border text-muted-foreground text-sm font-medium"
                 >
                   Your Job
                 </Badge>
               ) : hasApplied ? (
                 <Badge
                   variant="outline"
-                  className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider"
+                  className="border-foreground/30 text-foreground text-sm font-medium"
                 >
                   <Check className="w-3 h-3 mr-1" />
                   Interested
@@ -271,7 +271,7 @@ export default function JobsPage() {
               ) : (
                 <Button
                   size="sm"
-                  className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-[10px] tracking-wider"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
                   disabled={applyingTo === job.entityKey}
                   onClick={() => handleApply(job)}
                 >
@@ -282,7 +282,7 @@ export default function JobsPage() {
                   ) : (
                     <Briefcase className="w-3.5 h-3.5 mr-1" />
                   )}
-                  INTERESTED
+                  Interested
                 </Button>
               )}
             </div>
@@ -296,26 +296,26 @@ export default function JobsPage() {
     <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">[ JOB BOARD ]</h1>
-          <p className="text-[#A0A0A0] text-xs mt-1 normal-case">
+          <h1 className="text-2xl font-bold">Job board</h1>
+          <p className="text-muted-foreground text-xs mt-1 normal-case">
             On-chain job listings from the trust network
           </p>
         </div>
         <Button
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
           onClick={() => { if (!authenticated) { login(); return; } router.push('/jobs/post'); }}
         >
           <Plus className="w-4 h-4 mr-2" />
-          POST A JOB
+          Post a job
         </Button>
       </div>
 
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666]" />
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            className="pl-10 bg-[#2A2A2E] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
-            placeholder="FILTER BY TITLE, COMPANY, DESCRIPTION, OR TAG..."
+            className="pl-10 bg-card border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
+            placeholder="Filter by title, company, description, or tag..."
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
@@ -323,41 +323,41 @@ export default function JobsPage() {
         <Button
           variant="outline"
           size="sm"
-          className={`border-[#333] text-xs font-bold tracking-wider shrink-0 ${
+          className={`border-border text-sm font-medium shrink-0 ${
             remoteOnly
-              ? 'bg-[#FE7445]/10 border-[#FE7445]/30 text-[#FE7445]'
-              : 'text-[#A0A0A0] hover:text-white'
+              ? 'bg-primary/10 border-foreground/30 text-foreground'
+              : 'text-muted-foreground hover:text-white'
           }`}
           onClick={() => setRemoteOnly((prev) => !prev)}
         >
           <Wifi className="w-3.5 h-3.5 mr-1.5" />
-          REMOTE
+          Remote
         </Button>
       </div>
 
       {loading ? (
         <div className="text-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-[#FE7445] mx-auto mb-2" />
-          <p className="text-xs text-[#666] uppercase tracking-wider">Loading jobs from Arkiv...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-foreground mx-auto mb-2" />
+          <p className="text-sm font-medium text-muted-foreground">Loading jobs from Arkiv...</p>
         </div>
       ) : (
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="bg-[#2A2A2E] border border-[#333]">
+          <TabsList className="bg-card border border-border">
             <TabsTrigger
               value="all"
-              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-xs font-bold tracking-wider"
+              className="data-[state=active]:bg-muted data-[state=active]:text-white text-sm font-medium"
             >
-              ALL JOBS
-              <Badge variant="secondary" className="ml-2 bg-[#333] text-[#A0A0A0] text-[10px]">
+              All jobs
+              <Badge variant="secondary" className="ml-2 bg-muted text-muted-foreground text-[10px]">
                 {filteredJobs.length}
               </Badge>
             </TabsTrigger>
             <TabsTrigger
               value="mine"
-              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-xs font-bold tracking-wider"
+              className="data-[state=active]:bg-muted data-[state=active]:text-white text-sm font-medium"
             >
-              MY JOBS
-              <Badge variant="secondary" className="ml-2 bg-[#333] text-[#A0A0A0] text-[10px]">
+              My jobs
+              <Badge variant="secondary" className="ml-2 bg-muted text-muted-foreground text-[10px]">
                 {myJobs.length}
               </Badge>
             </TabsTrigger>
@@ -366,19 +366,19 @@ export default function JobsPage() {
           <TabsContent value="all" className="mt-4 space-y-3">
             {filteredJobs.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-2xl bg-[#2A2A2E] border border-[#333] flex items-center justify-center mx-auto mb-4">
-                  <Briefcase className="w-8 h-8 text-[#444]" />
+                <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+                  <Briefcase className="w-8 h-8 text-border" />
                 </div>
-                <p className="text-[#A0A0A0] text-sm normal-case">
+                <p className="text-muted-foreground text-sm normal-case">
                   {filter ? 'No jobs match your filter' : 'No jobs posted yet'}
                 </p>
-                <p className="text-xs text-[#666] mt-1 normal-case">
+                <p className="text-xs text-muted-foreground mt-1 normal-case">
                   {filter ? 'Try a different search term' : 'Be the first to post a job on the network'}
                 </p>
               </div>
             ) : (
               <>
-                <p className="text-[10px] text-[#666] uppercase tracking-wider">
+                <p className="text-sm font-medium text-muted-foreground">
                   {filteredJobs.length} job{filteredJobs.length !== 1 && 's'}
                 </p>
                 {filteredJobs.map((job) => renderJobCard(job, false))}
@@ -389,17 +389,17 @@ export default function JobsPage() {
           <TabsContent value="mine" className="mt-4 space-y-3">
             {myJobs.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-2xl bg-[#2A2A2E] border border-[#333] flex items-center justify-center mx-auto mb-4">
-                  <Briefcase className="w-8 h-8 text-[#444]" />
+                <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+                  <Briefcase className="w-8 h-8 text-border" />
                 </div>
-                <p className="text-[#A0A0A0] text-sm normal-case">You haven&apos;t posted any jobs yet</p>
-                <p className="text-xs text-[#666] mt-1 normal-case">
+                <p className="text-muted-foreground text-sm normal-case">You haven&apos;t posted any jobs yet</p>
+                <p className="text-xs text-muted-foreground mt-1 normal-case">
                   Post your first job to start hiring from the trust network
                 </p>
               </div>
             ) : (
               <>
-                <p className="text-[10px] text-[#666] uppercase tracking-wider">
+                <p className="text-sm font-medium text-muted-foreground">
                   {myJobs.length} listing{myJobs.length !== 1 && 's'}
                 </p>
                 {myJobs.map((job) => renderJobCard(job, true))}

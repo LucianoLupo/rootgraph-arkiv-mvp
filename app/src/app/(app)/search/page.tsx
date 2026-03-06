@@ -117,14 +117,14 @@ export default function SearchPage() {
     switch (result.connectionStatus) {
       case 'connected':
         return (
-          <Badge variant="outline" className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider">
+          <Badge variant="outline" className="border-primary/30 text-foreground text-xs">
             <Check className="w-3 h-3 mr-1" />
             Connected
           </Badge>
         );
       case 'pending':
         return (
-          <Badge variant="outline" className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider">
+          <Badge variant="outline" className="border-primary/30 text-foreground text-xs">
             <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
@@ -133,7 +133,7 @@ export default function SearchPage() {
         return (
           <Button
             size="sm"
-            className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-[10px] tracking-wider"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
             disabled={connectingWallet === result.wallet}
             onClick={(e) => {
               e.stopPropagation();
@@ -145,7 +145,7 @@ export default function SearchPage() {
             ) : (
               <UserPlus className="w-3.5 h-3.5 mr-1" />
             )}
-            CONNECT
+            Connect
           </Button>
         );
     }
@@ -154,75 +154,75 @@ export default function SearchPage() {
   return (
     <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">[ DISCOVER ]</h1>
-        <p className="text-[#A0A0A0] text-xs mt-1 normal-case">
+        <h1 className="text-2xl font-bold">Discover</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           Search by username to grow your trust network
         </p>
       </div>
 
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666]" />
+          <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            className="pl-10 bg-[#2A2A2E] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
-            placeholder="SEARCH BY USERNAME, NAME, WALLET, OR TAG..."
+            className="pl-10 bg-card border-border text-white placeholder:text-muted-foreground focus-visible:ring-primary/30 text-sm"
+            placeholder="Search by username, name, wallet, or tag..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
         <Button
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-6"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium px-6"
           onClick={handleSearch}
           disabled={isSearching || !query.trim()}
         >
           {isSearching ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            'SEARCH'
+            'Search'
           )}
         </Button>
       </div>
 
       {isSearching && (
         <div className="text-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-[#FE7445] mx-auto mb-2" />
-          <p className="text-xs text-[#666] uppercase tracking-wider">Searching on Arkiv...</p>
+          <Loader2 className="w-6 h-6 animate-spin text-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground font-medium">Searching on Arkiv...</p>
         </div>
       )}
 
       {!isSearching && hasSearched && results.length === 0 && (
         <div className="text-center py-12">
-          <SearchIcon className="w-10 h-10 text-[#444] mx-auto mb-3" />
-          <p className="text-[#A0A0A0] text-sm normal-case">No users found for &ldquo;{query}&rdquo;</p>
-          <p className="text-xs text-[#666] mt-1 normal-case">Try a different username</p>
+          <SearchIcon className="w-10 h-10 text-border mx-auto mb-3" />
+          <p className="text-muted-foreground text-sm">No users found for &ldquo;{query}&rdquo;</p>
+          <p className="text-xs text-muted-foreground mt-1">Try a different username</p>
         </div>
       )}
 
       {!isSearching && results.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[10px] text-[#666] uppercase tracking-wider">
+          <p className="text-sm text-muted-foreground font-medium">
             {results.length} result{results.length !== 1 && 's'} found
           </p>
           {results.map((result) => (
             <Card
               key={result.entityKey}
-              className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+              className="rounded-lg border border-border bg-card hover:border-primary/30 transition-colors cursor-pointer"
               onClick={() => router.push(`/profile/${result.wallet}`)}
             >
               <CardContent className="py-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="w-12 h-12">
-                    <AvatarFallback className="bg-[#333] text-[#A0A0A0] font-bold text-xs">
+                    <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs">
                       {(result.displayName || 'U').slice(0, 2).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium normal-case">{result.displayName || 'Anonymous'}</p>
-                    <p className="text-xs text-[#A0A0A0] normal-case">
+                    <p className="font-medium">{result.displayName || 'Anonymous'}</p>
+                    <p className="text-xs text-muted-foreground">
                       {result.position}
                       {result.company && (
-                        <span className="text-[#666]"> at {result.company}</span>
+                        <span className="text-muted-foreground"> at {result.company}</span>
                       )}
                     </p>
                     {result.tags && result.tags.length > 0 && (
@@ -231,7 +231,7 @@ export default function SearchPage() {
                           <Badge
                             key={tag}
                             variant="secondary"
-                            className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                            className="bg-primary/10 text-foreground border border-primary/30 text-[10px] px-1.5 py-0"
                           >
                             {tag}
                           </Badge>
@@ -249,46 +249,46 @@ export default function SearchPage() {
 
       {!hasSearched && (
         <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-[#2A2A2E] border border-[#333] flex items-center justify-center mx-auto mb-4">
-            <SearchIcon className="w-8 h-8 text-[#444]" />
+          <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+            <SearchIcon className="w-8 h-8 text-border" />
           </div>
-          <p className="text-[#A0A0A0] text-sm normal-case">Search for people on the network</p>
-          <p className="text-xs text-[#666] mt-1 normal-case">
+          <p className="text-muted-foreground text-sm">Search for people on the network</p>
+          <p className="text-xs text-muted-foreground mt-1">
             Find and connect with professionals on the decentralized trust graph
           </p>
         </div>
       )}
 
       <Dialog open={!!connectDialogTarget} onOpenChange={(open) => { if (!open) setConnectDialogTarget(null); }}>
-        <DialogContent className="bg-[#2A2A2E] border-[#333] sm:max-w-md">
+        <DialogContent className="bg-card border-border sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xs tracking-wider">SEND CONNECTION REQUEST</DialogTitle>
-            <DialogDescription className="text-[#A0A0A0] text-xs normal-case">
+            <DialogTitle className="text-sm font-medium">Send connection request</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs">
               Add an optional message to introduce yourself.
             </DialogDescription>
           </DialogHeader>
           <textarea
-            className="w-full rounded-md bg-[#1A1A1A] border border-[#333] text-white placeholder:text-[#666] text-xs p-3 min-h-[80px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FE7445]/30 font-mono"
+            className="w-full rounded-md bg-background border border-border text-white placeholder:text-muted-foreground text-xs p-3 min-h-[80px] resize-none focus:outline-none focus:ring-1 focus:ring-primary/30 font-mono"
             placeholder="Hi! I'd love to connect..."
             value={connectMessage}
             onChange={(e) => setConnectMessage(e.target.value)}
             maxLength={200}
           />
-          <p className="text-[10px] text-[#666] text-right">{connectMessage.length}/200</p>
+          <p className="text-xs text-muted-foreground text-right">{connectMessage.length}/200</p>
           <DialogFooter>
             <Button
               variant="outline"
-              className="border-[#444] text-[#A0A0A0] text-xs font-bold tracking-wider"
+              className="border-border text-muted-foreground text-sm font-medium"
               onClick={() => setConnectDialogTarget(null)}
             >
-              CANCEL
+              Cancel
             </Button>
             <Button
-              className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
               onClick={handleConnect}
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              SEND REQUEST
+              Send request
             </Button>
           </DialogFooter>
         </DialogContent>

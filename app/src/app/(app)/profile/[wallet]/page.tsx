@@ -111,7 +111,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+        <Loader2 className="w-6 h-6 animate-spin text-foreground" />
       </div>
     );
   }
@@ -123,33 +123,33 @@ export default function ProfilePage() {
     <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-xs text-[#A0A0A0] hover:text-white transition-colors font-bold tracking-wider uppercase"
+        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
       </button>
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="rounded-lg border border-border bg-card">
         <CardContent className="pt-8 pb-6">
           <div className="flex flex-col items-center text-center">
             <Avatar className="w-20 h-20 mb-4">
-              <AvatarFallback className="bg-[#FE7445]/15 text-[#FE7445] text-2xl font-bold">
+              <AvatarFallback className="bg-muted text-foreground text-2xl font-bold">
                 {initials}
               </AvatarFallback>
             </Avatar>
 
             <h1 className="text-xl font-bold normal-case">{displayName}</h1>
-            <p className="text-xs text-[#666] font-mono mt-0.5">
+            <p className="text-xs text-muted-foreground font-mono mt-0.5">
               {truncateWallet(targetWallet)}
             </p>
 
             {profile && (profile.position || profile.company) && (
-              <div className="flex items-center gap-2 mt-2 text-xs text-[#A0A0A0]">
+              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
                 <Briefcase className="w-3.5 h-3.5" />
                 <span className="normal-case">
                   {profile.position}
                   {profile.company && (
-                    <span className="text-[#666]"> at {profile.company}</span>
+                    <span className="text-muted-foreground"> at {profile.company}</span>
                   )}
                 </span>
               </div>
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground border border-border text-xs"
                   >
                     {tag}
                   </Badge>
@@ -171,11 +171,11 @@ export default function ProfilePage() {
 
             <div className="mt-6">
               {connectionStatus === 'loading' ? (
-                <Loader2 className="w-5 h-5 animate-spin text-[#666]" />
+                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
               ) : connectionStatus === 'connected' ? (
                 <Badge
                   variant="outline"
-                  className="border-[#FE7445]/30 text-[#FE7445] px-4 py-1.5 text-[10px] uppercase tracking-wider"
+                  className="border-border text-foreground px-4 py-1.5 text-xs"
                 >
                   <Check className="w-3.5 h-3.5 mr-1.5" />
                   Connected
@@ -183,14 +183,14 @@ export default function ProfilePage() {
               ) : connectionStatus === 'pending' ? (
                 <Badge
                   variant="outline"
-                  className="border-[#FE7445]/30 text-[#FE7445] px-4 py-1.5 text-[10px] uppercase tracking-wider"
+                  className="border-border text-muted-foreground px-4 py-1.5 text-xs"
                 >
                   <Clock className="w-3.5 h-3.5 mr-1.5" />
-                  Request Pending
+                  Request pending
                 </Badge>
               ) : (
                 <Button
-                  className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
                   onClick={() => { setConnectMessage(''); setConnectDialogOpen(true); }}
                   disabled={connecting}
                 >
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                   ) : (
                     <UserPlus className="w-4 h-4 mr-2" />
                   )}
-                  CONNECT
+                  Connect
                 </Button>
               )}
             </div>
@@ -208,37 +208,37 @@ export default function ProfilePage() {
       </Card>
 
       {connectionStatus === 'connected' && (
-        <Card className="bg-[#2A2A2E] border-[#333]">
+        <Card className="rounded-lg border border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-[10px] tracking-wider text-[#A0A0A0]">
-              [ CONNECTION DETAILS ]
+            <CardTitle className="text-xs text-muted-foreground font-medium">
+              Connection details
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#666] uppercase tracking-wider">Trust level</span>
-              <Badge variant="secondary" className="bg-[#FE7445]/10 text-[#FE7445] text-[10px] uppercase tracking-wider">
+              <span className="text-muted-foreground">Trust level</span>
+              <Badge variant="secondary" className="bg-primary/10 text-foreground text-xs">
                 Direct
               </Badge>
             </div>
-            <div className="h-px bg-[#333]" />
+            <div className="h-px bg-border" />
             <div className="flex items-center justify-between text-xs">
-              <span className="text-[#666] uppercase tracking-wider">Status</span>
-              <span className="text-[#A0A0A0] normal-case">On-chain verified</span>
+              <span className="text-muted-foreground">Status</span>
+              <span className="text-muted-foreground normal-case">On-chain verified</span>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="rounded-lg border border-border bg-card">
         <CardContent className="py-4">
           <a
             href={explorerUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-between text-xs text-[#A0A0A0] hover:text-[#FE7445] transition-colors"
+            className="flex items-center justify-between text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            <span className="flex items-center gap-2 uppercase tracking-wider font-bold">
+            <span className="flex items-center gap-2 font-medium">
               <MapPin className="w-4 h-4" />
               View on Arkiv Explorer
             </span>
@@ -248,35 +248,35 @@ export default function ProfilePage() {
       </Card>
 
       <Dialog open={connectDialogOpen} onOpenChange={setConnectDialogOpen}>
-        <DialogContent className="bg-[#2A2A2E] border-[#333] sm:max-w-md">
+        <DialogContent className="bg-card border-border sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xs tracking-wider">SEND CONNECTION REQUEST</DialogTitle>
-            <DialogDescription className="text-[#A0A0A0] text-xs normal-case">
+            <DialogTitle className="text-sm font-medium">Send connection request</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-xs normal-case">
               Add an optional message to introduce yourself.
             </DialogDescription>
           </DialogHeader>
           <textarea
-            className="w-full rounded-md bg-[#1A1A1A] border border-[#333] text-white placeholder:text-[#666] text-xs p-3 min-h-[80px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FE7445]/30 font-mono"
+            className="w-full rounded-md bg-input border border-border text-foreground placeholder:text-muted-foreground text-xs p-3 min-h-[80px] resize-none focus:outline-none focus:ring-1 focus:ring-ring font-mono"
             placeholder="Hi! I'd love to connect..."
             value={connectMessage}
             onChange={(e) => setConnectMessage(e.target.value)}
             maxLength={200}
           />
-          <p className="text-[10px] text-[#666] text-right">{connectMessage.length}/200</p>
+          <p className="text-xs text-muted-foreground text-right">{connectMessage.length}/200</p>
           <DialogFooter>
             <Button
               variant="outline"
-              className="border-[#444] text-[#A0A0A0] text-xs font-bold tracking-wider"
+              className="border-border text-muted-foreground text-sm font-medium"
               onClick={() => setConnectDialogOpen(false)}
             >
-              CANCEL
+              Cancel
             </Button>
             <Button
-              className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
               onClick={handleConnect}
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              SEND REQUEST
+              Send request
             </Button>
           </DialogFooter>
         </DialogContent>

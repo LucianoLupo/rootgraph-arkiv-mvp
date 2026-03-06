@@ -58,28 +58,28 @@ export function KaolinSetupModal({ open, onOpenChange, walletAddress }: KaolinSe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#1A1A1A] border-[#333] text-white max-w-md">
+      <DialogContent className="bg-background border-border text-foreground max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-sm font-bold tracking-wider text-[#FE7445]">
-            [ KAOLIN NETWORK SETUP ]
+          <DialogTitle className="text-sm font-medium text-foreground">
+            Kaolin network setup
           </DialogTitle>
-          <DialogDescription className="text-[#A0A0A0] text-xs normal-case">
+          <DialogDescription className="text-muted-foreground text-xs normal-case">
             Follow these steps to transact on the Kaolin testnet
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
           {/* Section 1: Add Chain */}
-          <div className="rounded-lg bg-[#2A2A2E] border border-[#333] p-4 space-y-3">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <Wallet className="w-4 h-4 text-[#FE7445]" />
-              <h3 className="text-xs font-bold tracking-wider uppercase">1. Add Kaolin Network</h3>
+              <Wallet className="w-4 h-4 text-foreground" />
+              <h3 className="text-sm font-medium">1. Add Kaolin network</h3>
             </div>
-            <p className="text-[10px] text-[#A0A0A0] normal-case">
+            <p className="text-xs text-muted-foreground normal-case">
               Add the Kaolin chain to MetaMask or your browser wallet.
             </p>
             <Button
-              className="w-full bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium"
               onClick={addChain}
               disabled={adding || addResult === 'success'}
             >
@@ -90,56 +90,56 @@ export function KaolinSetupModal({ open, onOpenChange, walletAddress }: KaolinSe
               ) : (
                 <Wallet className="w-4 h-4 mr-2" />
               )}
-              {adding ? 'ADDING...' : addResult === 'success' ? 'ADDED' : 'ADD KAOLIN TO WALLET'}
+              {adding ? 'Adding...' : addResult === 'success' ? 'Added' : 'Add Kaolin to wallet'}
             </Button>
             {addResult === 'error' && (
-              <p className="text-[10px] text-red-400 normal-case">
+              <p className="text-xs text-red-400 normal-case">
                 Failed to add chain. Make sure you have a browser wallet installed.
               </p>
             )}
           </div>
 
           {/* Section 2: Get Testnet ETH */}
-          <div className="rounded-lg bg-[#2A2A2E] border border-[#333] p-4 space-y-3">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <Droplets className="w-4 h-4 text-[#FE7445]" />
-              <h3 className="text-xs font-bold tracking-wider uppercase">2. Get Testnet ETH</h3>
+              <Droplets className="w-4 h-4 text-foreground" />
+              <h3 className="text-sm font-medium">2. Get testnet ETH</h3>
             </div>
-            <p className="text-[10px] text-[#A0A0A0] normal-case">
+            <p className="text-xs text-muted-foreground normal-case">
               Use the faucet to get free testnet ETH for transactions.
             </p>
             {walletAddress && (
-              <div className="flex items-center gap-2 bg-[#1A1A1A] rounded px-3 py-2">
-                <code className="text-[10px] text-[#A0A0A0] font-mono truncate flex-1">
+              <div className="flex items-center gap-2 bg-input border border-border rounded px-3 py-2">
+                <code className="text-xs text-muted-foreground font-mono truncate flex-1">
                   {walletAddress}
                 </code>
                 <button
                   onClick={copyAddress}
-                  className="text-[#666] hover:text-[#FE7445] transition-colors shrink-0"
+                  className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
                   title="Copy address"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5 text-[#FE7445]" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copied ? <Check className="w-3.5 h-3.5 text-foreground" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
               </div>
             )}
             <a href={FAUCET_URL} target="_blank" rel="noopener noreferrer">
               <Button
                 variant="outline"
-                className="w-full border-[#333] text-[#A0A0A0] hover:text-white hover:bg-[#333] font-bold text-xs tracking-wider"
+                className="w-full border-border text-muted-foreground hover:text-foreground hover:bg-muted text-sm font-medium"
               >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                OPEN FAUCET
+                Open faucet
               </Button>
             </a>
           </div>
 
           {/* Section 3: Embedded Wallet Note */}
-          <div className="rounded-lg bg-[#2A2A2E] border border-[#333] p-4 space-y-2">
+          <div className="rounded-lg border border-border bg-card p-4 space-y-2">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-[#FE7445]" />
-              <h3 className="text-xs font-bold tracking-wider uppercase">Embedded Wallet Users</h3>
+              <Shield className="w-4 h-4 text-foreground" />
+              <h3 className="text-sm font-medium">Embedded wallet users</h3>
             </div>
-            <p className="text-[10px] text-[#A0A0A0] normal-case">
+            <p className="text-xs text-muted-foreground normal-case">
               If you signed in with Google (Privy), the Kaolin network is already configured.
               You only need testnet ETH from the faucet above.
             </p>

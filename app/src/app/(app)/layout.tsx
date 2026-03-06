@@ -27,13 +27,13 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { href: '/dashboard', label: 'DASHBOARD', icon: LayoutDashboard },
-  { href: '/connections', label: 'CONNECTIONS', icon: Users },
-  { href: '/jobs', label: 'JOBS', icon: Briefcase },
-  { href: '/company', label: 'COMPANY', icon: Building2 },
-  { href: '/trustmap', label: 'TRUST MAP', icon: Map },
-  { href: '/search', label: 'SEARCH', icon: Search },
-  { href: '/settings', label: 'SETTINGS', icon: Settings },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/connections', label: 'Connections', icon: Users },
+  { href: '/jobs', label: 'Jobs', icon: Briefcase },
+  { href: '/company', label: 'Company', icon: Building2 },
+  { href: '/trustmap', label: 'Trust Map', icon: Map },
+  { href: '/search', label: 'Search', icon: Search },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 const PUBLIC_PATHS = ['/jobs', '/company'];
@@ -58,12 +58,12 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-2 px-4 py-5">
-        <span className="text-lg font-bold tracking-wider text-[#FE7445]">
+        <span className="text-lg font-bold tracking-wider text-foreground">
           [ ROOTGRAPH ]
         </span>
       </div>
 
-      <div className="h-px bg-[#333]" />
+      <div className="h-px bg-border" />
 
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
@@ -72,13 +72,13 @@ function SidebarContent({
             <button
               key={item.href}
               onClick={() => onNavigate(item.href)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold tracking-wider transition-colors ${
+              className={`w-full flex items-center px-4 py-3 gap-3 rounded-lg text-[15px] transition-colors ${
                 isActive
-                  ? 'bg-[#FE7445]/10 text-[#FE7445] border-l-2 border-[#FE7445]'
-                  : 'text-[#A0A0A0] hover:text-white hover:bg-[#2A2A2E]'
+                  ? 'bg-muted text-foreground'
+                  : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
               }`}
             >
-              <item.icon className="w-4 h-4" />
+              <item.icon className="h-5 w-5" />
               {item.label}
             </button>
           );
@@ -86,26 +86,26 @@ function SidebarContent({
       </nav>
 
       <div className="px-3 pb-4">
-        <div className="mb-3 rounded-lg bg-[#2A2A2E] px-3 py-2">
-          <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold">Connected as</p>
-          <p className="truncate text-xs font-mono text-[#A0A0A0]">{identity}</p>
+        <div className="mb-3 rounded-lg bg-muted px-3 py-2">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Connected as</p>
+          <p className="truncate text-xs font-mono text-muted-foreground">{identity}</p>
         </div>
-        <div className="h-px bg-[#333] mb-3" />
+        <div className="h-px bg-border mb-3" />
         <Button
           variant="ghost"
-          className="w-full justify-start text-[#A0A0A0] hover:text-[#FE7445] hover:bg-[#FE7445]/10 text-xs font-bold tracking-wider"
+          className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50"
           onClick={onNetworkSetup}
         >
-          <HelpCircle className="w-4 h-4 mr-3" />
-          NETWORK SETUP
+          <HelpCircle className="h-5 w-5 mr-3" />
+          Network Setup
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start text-[#A0A0A0] hover:text-red-400 hover:bg-red-500/10 text-xs font-bold tracking-wider"
+          className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-muted/50"
           onClick={onLogout}
         >
-          <LogOut className="w-4 h-4 mr-3" />
-          DISCONNECT
+          <LogOut className="h-5 w-5 mr-3" />
+          Logout
         </Button>
       </div>
     </div>
@@ -161,10 +161,10 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
 
   if (!ready || !isReady) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#1A1A1A]">
+      <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-[#FE7445]" />
-          <p className="text-xs text-[#666] uppercase tracking-wider font-bold">Initializing...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+          <p className="text-xs text-muted-foreground uppercase tracking-wider">Initializing...</p>
         </div>
       </div>
     );
@@ -173,21 +173,21 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   // Public pages: show minimal header for unauthenticated users
   if (!authenticated && isPublic) {
     return (
-      <div className="min-h-screen bg-[#1A1A1A] text-white">
-        <header className="border-b border-[#333] bg-[#141414]">
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="border-b border-border/60 bg-background">
           <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
             <button
               onClick={() => router.push('/')}
-              className="text-lg font-bold tracking-wider text-[#FE7445]"
+              className="text-lg font-bold tracking-wider text-foreground"
             >
               [ ROOTGRAPH ]
             </button>
             <Button
-              className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider"
+              className="bg-primary text-primary-foreground font-medium text-sm"
               onClick={login}
             >
               <LogIn className="w-4 h-4 mr-2" />
-              CONNECT WALLET
+              Connect Wallet
             </Button>
           </div>
         </header>
@@ -209,9 +209,9 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] text-white flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 border-r border-[#333] bg-[#141414] flex-col shrink-0">
+      <aside className="hidden md:flex w-64 border-r border-border/60 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70 flex-col shrink-0">
         <SidebarContent
           pathname={pathname}
           onNavigate={handleNavigate}
@@ -222,20 +222,20 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#141414]/95 backdrop-blur-sm border-b border-[#333]">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/60">
         <div className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm font-bold tracking-wider text-[#FE7445]">
+          <span className="text-sm font-bold tracking-wider text-foreground">
             [ ROOTGRAPH ]
           </span>
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-[#A0A0A0]" aria-label="Open menu">
+              <Button variant="ghost" size="sm" className="text-muted-foreground" aria-label="Open menu">
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-64 p-0 bg-[#141414] border-[#333]"
+              className="w-64 p-0 bg-background border-border"
             >
               <SidebarContent
                 pathname={pathname}

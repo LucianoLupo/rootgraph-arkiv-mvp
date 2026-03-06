@@ -238,7 +238,7 @@ export default function EditJobPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+        <Loader2 className="w-6 h-6 animate-spin text-foreground" />
       </div>
     );
   }
@@ -248,13 +248,13 @@ export default function EditJobPage() {
       <div>
         <button
           onClick={() => router.push(`/jobs/${jobId}`)}
-          className="flex items-center gap-1.5 text-[10px] text-[#666] hover:text-[#FE7445] transition-colors uppercase tracking-wider mb-4"
+          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="w-3 h-3" />
           Back to Job
         </button>
-        <h1 className="text-2xl font-bold">[ EDIT JOB ]</h1>
-        <p className="text-[#A0A0A0] text-xs mt-1 normal-case">
+        <h1 className="text-2xl font-bold">Edit job</h1>
+        <p className="text-muted-foreground text-xs mt-1 normal-case">
           Update your on-chain job listing
         </p>
       </div>
@@ -264,7 +264,7 @@ export default function EditJobPage() {
           <CardContent className="py-4">
             <div className="flex items-center gap-3">
               <CheckCircle className="w-5 h-5 text-yellow-500 shrink-0" />
-              <p className="text-xs text-yellow-500 uppercase tracking-wider font-bold">
+              <p className="text-sm font-medium text-yellow-500">
                 This job is marked as filled
               </p>
             </div>
@@ -272,18 +272,18 @@ export default function EditJobPage() {
         </Card>
       )}
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="rounded-lg border border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xs tracking-wider">[ JOB DETAILS ]</CardTitle>
+          <CardTitle className="text-sm font-medium">Job details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="title" className="text-muted-foreground text-sm font-medium">
               Job Title <span className="text-red-400">*</span>
             </Label>
             <Input
               id="title"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="e.g. Senior Solidity Developer"
               value={form.title}
               onChange={(e) => updateField('title', e.target.value)}
@@ -291,12 +291,12 @@ export default function EditJobPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="company" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="company" className="text-muted-foreground text-sm font-medium">
               Company
             </Label>
             <Input
               id="company"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="e.g. Arkiv Network"
               value={form.company}
               onChange={(e) => updateField('company', e.target.value)}
@@ -305,25 +305,25 @@ export default function EditJobPage() {
 
           <div className="flex gap-4">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="location" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+              <Label htmlFor="location" className="text-muted-foreground text-sm font-medium">
                 Location
               </Label>
               <Input
                 id="location"
-                className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+                className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
                 placeholder="e.g. San Francisco, CA"
                 value={form.location}
                 onChange={(e) => updateField('location', e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+              <Label className="text-muted-foreground text-sm font-medium">
                 Remote
               </Label>
               <button
                 onClick={() => updateField('isRemote', !form.isRemote)}
                 className={`block w-14 h-8 rounded-full transition-colors ${
-                  form.isRemote ? 'bg-[#FE7445]' : 'bg-[#333]'
+                  form.isRemote ? 'bg-primary' : 'bg-muted'
                 }`}
               >
                 <span
@@ -337,17 +337,17 @@ export default function EditJobPage() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="salary" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+              <Label htmlFor="salary" className="text-muted-foreground text-sm font-medium">
                 <DollarSign className="w-3 h-3 inline mr-1.5" />
                 Salary / Compensation
               </Label>
               {isEncryptionEnabled && (
                 <button
                   onClick={() => setPrivateSalary(!privateSalary)}
-                  className={`flex items-center gap-1.5 text-[10px] font-bold tracking-wider uppercase transition-all px-2.5 py-1 rounded-full ${
+                  className={`flex items-center gap-1.5 text-sm font-medium  uppercase transition-all px-2.5 py-1 rounded-full ${
                     privateSalary
                       ? 'bg-green-500/15 text-green-400 border border-green-500/30'
-                      : 'bg-[#333] text-[#A0A0A0] border border-[#444] hover:border-[#666]'
+                      : 'bg-muted text-muted-foreground border border-border hover:border-muted-foreground'
                   }`}
                 >
                   {privateSalary ? <Lock className="w-3 h-3" /> : <Shield className="w-3 h-3" />}
@@ -357,17 +357,17 @@ export default function EditJobPage() {
             </div>
 
             {privateSalary ? (
-              <div className="space-y-3 bg-[#1A1A1A] rounded-md p-4 border border-green-500/20">
+              <div className="space-y-3 bg-background rounded-md p-4 border border-green-500/20">
                 <p className="text-[10px] text-green-400 normal-case flex items-center gap-1.5">
                   <Lock className="w-3 h-3" />
                   Exact salary encrypted. Only you can see it.
                 </p>
                 <div className="flex gap-3">
                   <div className="flex-1 space-y-1">
-                    <Label className="text-[10px] text-[#666] uppercase tracking-wider">Exact Amount</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Exact Amount</Label>
                     <Input
                       type="number"
-                      className="bg-[#2A2A2E] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-green-500/30 text-xs"
+                      className="bg-card border-border text-white placeholder:text-muted-foreground focus-visible:ring-green-500/30 text-xs"
                       placeholder="e.g. 150000"
                       value={salaryAmount}
                       onChange={(e) => {
@@ -377,9 +377,9 @@ export default function EditJobPage() {
                     />
                   </div>
                   <div className="w-24 space-y-1">
-                    <Label className="text-[10px] text-[#666] uppercase tracking-wider">Currency</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Currency</Label>
                     <select
-                      className="w-full h-10 rounded-md bg-[#2A2A2E] border border-[#333] text-white text-xs px-2 focus:outline-none focus:ring-1 focus:ring-green-500/30"
+                      className="w-full h-10 rounded-md bg-card border border-border text-white text-xs px-2 focus:outline-none focus:ring-1 focus:ring-green-500/30"
                       value={salaryCurrency}
                       onChange={(e) => setSalaryCurrency(e.target.value)}
                     >
@@ -391,23 +391,23 @@ export default function EditJobPage() {
                 </div>
                 {salaryAmount && !isNaN(parseInt(salaryAmount, 10)) && parseInt(salaryAmount, 10) > 0 && (
                   <div className="space-y-2">
-                    <Label className="text-[10px] text-[#666] uppercase tracking-wider">Public Range</Label>
+                    <Label className="text-sm font-medium text-muted-foreground">Public Range</Label>
                     <div className="flex gap-3">
                       <Input
                         type="number"
-                        className="bg-[#2A2A2E] border-[#333] text-white text-xs"
+                        className="bg-card border-border text-white text-xs"
                         value={salaryRangeMin}
                         onChange={(e) => setSalaryRangeMin(parseInt(e.target.value, 10) || 0)}
                       />
-                      <span className="text-[#666] self-center">-</span>
+                      <span className="text-muted-foreground self-center">-</span>
                       <Input
                         type="number"
-                        className="bg-[#2A2A2E] border-[#333] text-white text-xs"
+                        className="bg-card border-border text-white text-xs"
                         value={salaryRangeMax}
                         onChange={(e) => setSalaryRangeMax(parseInt(e.target.value, 10) || 0)}
                       />
                     </div>
-                    <p className="text-[10px] text-[#888] normal-case">
+                    <p className="text-[10px] text-muted-foreground normal-case">
                       Displayed as: <span className="text-white font-medium">{formatSalaryRange(salaryRangeMin, salaryRangeMax, salaryCurrency)}</span>
                     </p>
                   </div>
@@ -416,7 +416,7 @@ export default function EditJobPage() {
             ) : (
               <Input
                 id="salary"
-                className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+                className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
                 placeholder="e.g. $120k-$180k, Competitive, Negotiable"
                 value={form.salary}
                 onChange={(e) => updateField('salary', e.target.value)}
@@ -424,46 +424,46 @@ export default function EditJobPage() {
             )}
           </div>
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-muted" />
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="description" className="text-muted-foreground text-sm font-medium">
               Description
             </Label>
             <textarea
               id="description"
-              className="w-full rounded-md bg-[#1A1A1A] border border-[#333] text-white placeholder:text-[#666] text-xs p-3 min-h-[120px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FE7445]/30 font-mono"
+              className="w-full rounded-md bg-background border border-border text-white placeholder:text-muted-foreground text-xs p-3 min-h-[120px] resize-none focus:outline-none focus:ring-1 focus:ring-ring font-mono"
               placeholder="Describe the role, responsibilities, and requirements..."
               value={form.description}
               onChange={(e) => updateField('description', e.target.value)}
               maxLength={2000}
             />
-            <p className="text-[10px] text-[#666] text-right">{form.description.length}/2000</p>
+            <p className="text-[10px] text-muted-foreground text-right">{form.description.length}/2000</p>
           </div>
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-muted" />
 
           <div className="space-y-2">
-            <Label htmlFor="applyUrl" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="applyUrl" className="text-muted-foreground text-sm font-medium">
               <ExternalLink className="w-3 h-3 inline mr-1.5" />
               Apply URL
             </Label>
             <Input
               id="applyUrl"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="https://yourcompany.com/careers/apply"
               value={form.applyUrl}
               onChange={(e) => updateField('applyUrl', e.target.value)}
             />
-            <p className="text-[10px] text-[#666] normal-case">
+            <p className="text-[10px] text-muted-foreground normal-case">
               External link where candidates can apply for this position
             </p>
           </div>
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-muted" />
 
           <div className="space-y-3">
-            <Label className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">Tags</Label>
+            <Label className="text-muted-foreground text-sm font-medium">Tags</Label>
             <div className="flex flex-wrap gap-2">
               {JOB_TAGS.map((tag) => {
                 const isSelected = form.tags.includes(tag);
@@ -471,10 +471,10 @@ export default function EditJobPage() {
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium  uppercase transition-all ${
                       isSelected
-                        ? 'bg-[#FE7445]/15 text-[#FE7445] border border-[#FE7445]/30'
-                        : 'bg-[#333] text-[#A0A0A0] border border-[#444] hover:border-[#666]'
+                        ? 'bg-primary/15 text-foreground border border-foreground/30'
+                        : 'bg-muted text-muted-foreground border border-border hover:border-muted-foreground'
                     }`}
                   >
                     {tag}
@@ -488,7 +488,7 @@ export default function EditJobPage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] text-[10px] cursor-pointer hover:bg-[#FE7445]/20 uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground text-[10px] cursor-pointer hover:bg-primary/20 "
                     onClick={() => toggleTag(tag)}
                   >
                     {tag}
@@ -506,7 +506,7 @@ export default function EditJobPage() {
           {currentStatus === 'active' && (
             <Button
               variant="outline"
-              className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 font-bold text-xs tracking-wider"
+              className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 text-sm font-medium "
               onClick={() => handleSave('filled')}
               disabled={markingFilled || saving || generatingProof}
             >
@@ -515,25 +515,25 @@ export default function EditJobPage() {
               ) : (
                 <CheckCircle className="w-4 h-4 mr-2" />
               )}
-              MARK AS FILLED
+              Mark as filled
             </Button>
           )}
           {currentStatus === 'filled' && (
             <Button
               variant="outline"
-              className="border-[#FE7445]/30 text-[#FE7445] hover:bg-[#FE7445]/10 font-bold text-xs tracking-wider"
+              className="border-foreground/30 text-foreground hover:bg-primary/10 text-sm font-medium "
               onClick={() => handleSave('active')}
               disabled={markingFilled || saving || generatingProof}
             >
               {markingFilled ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
               ) : null}
-              REACTIVATE
+              Reactivate
             </Button>
           )}
         </div>
         <Button
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-8"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium  px-8"
           onClick={() => handleSave()}
           disabled={saving || generatingProof || !form.title.trim()}
         >
@@ -542,7 +542,7 @@ export default function EditJobPage() {
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {generatingProof ? 'GENERATING PROOF...' : 'UPDATE JOB'}
+          {generatingProof ? 'Generating proof...' : 'Update job'}
         </Button>
       </div>
     </div>
