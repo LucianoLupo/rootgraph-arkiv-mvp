@@ -628,10 +628,12 @@ export type GraphProfile = ProfileData & {
 export async function fetchGraphData(): Promise<{
   profiles: GraphProfile[]
   connections: Connection[]
+  companies: Company[]
+  jobs: Job[]
 }> {
   const client = getArkivPublicClient()
 
-  const [profiles, connectionResult] = await Promise.all([
+  const [profiles, connectionResult, companies, jobs] = await Promise.all([
     getAllProfiles(),
     client
       .buildQuery()
@@ -640,6 +642,8 @@ export async function fetchGraphData(): Promise<{
       .withAttributes(true)
       .limit(500)
       .fetch(),
+    getAllCompanies(),
+    getAllJobs(),
   ])
 
   const connections = connectionResult.entities.map((entity) => {
@@ -647,7 +651,7 @@ export async function fetchGraphData(): Promise<{
     return { ...data, entityKey: entity.key }
   })
 
-  return { profiles, connections }
+  return { profiles, connections, companies, jobs }
 }
 
 // --- Jobs ---
@@ -864,6 +868,28 @@ export async function getApplicationsByApplicant(
 }
 
 // --- Companies ---
+
+export async function getAllCompanies(): Promise<Company[]> {
+  const client = getArkivPublicClient()
+  const result = await client
+    .buildQuery()
+    .where([eq('entityType', 'company'), eq('app', APP_TAG)])
+    .withPayload(true)
+    .withAttributes(true)
+    .withMetadata(true)
+    .limit(200)
+    .fetch()
+
+  return result.entities.map((entity) => {
+    const data = entity.toJson() as CompanyData
+    const walletAttr = entity.attributes.find((a) => a.key === 'wallet')
+    return {
+      ...data,
+      entityKey: entity.key,
+      wallet: walletAttr?.value?.toString() ?? '',
+    }
+  })
+}
 
 export async function getCompanyByWallet(wallet: string): Promise<Company | null> {
   const client = getArkivPublicClient()
