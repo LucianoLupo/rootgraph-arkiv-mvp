@@ -193,7 +193,7 @@ export default function JobDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+        <Loader2 className="w-6 h-6 animate-spin text-foreground" />
       </div>
     );
   }
@@ -203,16 +203,16 @@ export default function JobDetailPage() {
       <div className="p-6 lg:p-8 max-w-2xl mx-auto">
         <button
           onClick={() => router.push('/jobs')}
-          className="flex items-center gap-1.5 text-[10px] text-[#666] hover:text-[#FE7445] transition-colors uppercase tracking-wider mb-4"
+          className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-4"
         >
           <ArrowLeft className="w-3 h-3" />
           Back to Jobs
         </button>
         <div className="text-center py-16">
-          <div className="w-16 h-16 rounded-2xl bg-[#2A2A2E] border border-[#333] flex items-center justify-center mx-auto mb-4">
-            <Briefcase className="w-8 h-8 text-[#444]" />
+          <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+            <Briefcase className="w-8 h-8 text-border" />
           </div>
-          <p className="text-[#A0A0A0] text-sm normal-case">Job not found</p>
+          <p className="text-muted-foreground text-sm normal-case">Job not found</p>
         </div>
       </div>
     );
@@ -225,12 +225,12 @@ export default function JobDetailPage() {
     if (job.salaryData) {
       const rangeText = formatSalaryRange(job.salaryData.rangeMin, job.salaryData.rangeMax, job.salaryData.currency);
       return (
-        <span className="flex items-center gap-1 text-xs text-[#888]">
+        <span className="flex items-center gap-1 text-xs text-muted-foreground">
           <DollarSign className="w-3.5 h-3.5" />
           {isOwnJob && decryptedSalary ? (
             <span>
               <span className="text-green-400">{job.salaryData.currency} {parseInt(decryptedSalary).toLocaleString()}</span>
-              <span className="text-[#666] ml-1.5">({rangeText})</span>
+              <span className="text-muted-foreground ml-1.5">({rangeText})</span>
             </span>
           ) : (
             rangeText
@@ -251,7 +251,7 @@ export default function JobDetailPage() {
     }
     if (job.salary) {
       return (
-        <span className="flex items-center gap-1 text-xs text-[#888]">
+        <span className="flex items-center gap-1 text-xs text-muted-foreground">
           <DollarSign className="w-3.5 h-3.5" />
           {job.salary}
         </span>
@@ -264,24 +264,24 @@ export default function JobDetailPage() {
     <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
       <button
         onClick={() => router.push('/jobs')}
-        className="flex items-center gap-1.5 text-[10px] text-[#666] hover:text-[#FE7445] transition-colors uppercase tracking-wider"
+        className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="w-3 h-3" />
         Back to Jobs
       </button>
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="bg-card border-border">
         <CardContent className="pt-6 pb-6 space-y-4">
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-xl font-bold normal-case">{job.title}</h1>
-              <p className="text-sm text-[#A0A0A0] normal-case mt-1">{job.company}</p>
+              <p className="text-sm text-muted-foreground normal-case mt-1">{job.company}</p>
             </div>
             {authenticated && isOwnJob && (
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#444] text-[#A0A0A0] text-[10px] uppercase tracking-wider shrink-0"
+                className="border-border text-muted-foreground text-sm font-medium shrink-0"
                 onClick={() => router.push(`/jobs/${job.entityKey}/edit`)}
               >
                 <Pencil className="w-3 h-3 mr-1.5" />
@@ -292,7 +292,7 @@ export default function JobDetailPage() {
 
           <div className="flex items-center flex-wrap gap-3">
             {job.location && (
-              <span className="flex items-center gap-1 text-xs text-[#888]">
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <MapPin className="w-3.5 h-3.5" />
                 {job.location}
               </span>
@@ -300,25 +300,25 @@ export default function JobDetailPage() {
             {job.isRemote && (
               <Badge
                 variant="outline"
-                className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider px-1.5 py-0"
+                className="border-foreground/30 text-foreground text-[10px]  px-1.5 py-0"
               >
                 <Wifi className="w-3 h-3 mr-1" />
                 Remote
               </Badge>
             )}
             {renderSalaryDisplay()}
-            <span className="flex items-center gap-1 text-[10px] text-[#666]">
+            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
               <Clock className="w-3 h-3" />
               {daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}
             </span>
             {applicationCount > 0 && (
-              <span className="flex items-center gap-1 text-[10px] text-[#666]">
+              <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                 <Users className="w-3 h-3" />
                 {applicationCount} interested
               </span>
             )}
             {job.status === 'filled' && (
-              <Badge variant="outline" className="border-yellow-500/30 text-yellow-500 text-[10px] uppercase tracking-wider">
+              <Badge variant="outline" className="border-yellow-500/30 text-yellow-500 text-[10px] ">
                 Filled
               </Badge>
             )}
@@ -328,7 +328,7 @@ export default function JobDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              className="border-green-500/30 text-green-400 hover:bg-green-500/10 text-[10px] uppercase tracking-wider"
+              className="border-green-500/30 text-green-400 hover:bg-green-500/10 text-[10px] "
               onClick={handleVerifyProof}
               disabled={verifying}
             >
@@ -337,7 +337,7 @@ export default function JobDetailPage() {
               ) : (
                 <ShieldCheck className="w-3 h-3 mr-1.5" />
               )}
-              VERIFY SALARY RANGE
+              Verify salary range
             </Button>
           )}
 
@@ -347,7 +347,7 @@ export default function JobDetailPage() {
                 <Badge
                   key={tag}
                   variant="secondary"
-                  className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                  className="bg-primary/10 text-foreground border border-foreground/30 text-[10px] px-1.5 py-0 "
                 >
                   {tag}
                 </Badge>
@@ -355,15 +355,15 @@ export default function JobDetailPage() {
             </div>
           )}
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-muted" />
 
           {job.description && (
-            <p className="text-xs text-[#A0A0A0] normal-case whitespace-pre-wrap leading-relaxed">
+            <p className="text-xs text-muted-foreground normal-case whitespace-pre-wrap leading-relaxed">
               {job.description}
             </p>
           )}
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-muted" />
 
           <div className="flex items-center gap-3">
             {job.applyUrl && (
@@ -372,23 +372,23 @@ export default function JobDetailPage() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Button className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium ">
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  APPLY NOW
+                  Apply now
                 </Button>
               </a>
             )}
             {isOwnJob ? (
               <Badge
                 variant="outline"
-                className="border-[#444] text-[#666] text-[10px] uppercase tracking-wider px-3 py-1.5"
+                className="border-border text-muted-foreground text-[10px]  px-3 py-1.5"
               >
                 Your Job
               </Badge>
             ) : hasApplied ? (
               <Badge
                 variant="outline"
-                className="border-[#FE7445]/30 text-[#FE7445] text-[10px] uppercase tracking-wider px-3 py-1.5"
+                className="border-foreground/30 text-foreground text-[10px]  px-3 py-1.5"
               >
                 <Check className="w-3 h-3 mr-1" />
                 Interested
@@ -397,8 +397,8 @@ export default function JobDetailPage() {
               <Button
                 variant={job.applyUrl ? 'outline' : 'default'}
                 className={job.applyUrl
-                  ? 'border-[#FE7445]/30 text-[#FE7445] hover:bg-[#FE7445]/10 font-bold text-xs tracking-wider'
-                  : 'bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider'
+                  ? 'border-foreground/30 text-foreground hover:bg-primary/10 text-sm font-medium '
+                  : 'bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium '
                 }
                 disabled={applying}
                 onClick={handleApply}
@@ -410,17 +410,17 @@ export default function JobDetailPage() {
                 ) : (
                   <Briefcase className="w-4 h-4 mr-2" />
                 )}
-                EXPRESS INTEREST
+                Express interest
               </Button>
             ) : null}
             {authenticated && !isOwnJob && (
               <Button
                 variant="ghost"
                 size="sm"
-                className={`text-[10px] uppercase tracking-wider ${
+                className={`text-[10px]  ${
                   hasFlagged
                     ? 'text-red-400'
-                    : 'text-[#666] hover:text-red-400'
+                    : 'text-muted-foreground hover:text-red-400'
                 }`}
                 disabled={hasFlagged || flagging}
                 onClick={handleFlag}
@@ -430,7 +430,7 @@ export default function JobDetailPage() {
                 ) : (
                   <Flag className="w-3 h-3 mr-1" />
                 )}
-                {hasFlagged ? 'FLAGGED' : 'FLAG'}
+                {hasFlagged ? 'Flagged' : 'Flag'}
               </Button>
             )}
             {isOwnJob && flagCount > 0 && (
@@ -446,7 +446,7 @@ export default function JobDetailPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <textarea
-                  className="w-full rounded-md bg-[#1A1A1A] border border-[#333] text-white placeholder:text-[#666] text-xs p-3 min-h-[60px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FE7445]/30 font-mono"
+                  className="w-full rounded-md bg-background border border-border text-white placeholder:text-muted-foreground text-xs p-3 min-h-[60px] resize-none focus:outline-none focus:ring-1 focus:ring-ring font-mono"
                   placeholder="Optional message to the poster..."
                   value={applicationMessage}
                   onChange={(e) => setApplicationMessage(e.target.value)}
@@ -472,9 +472,9 @@ export default function JobDetailPage() {
 
       {/* Applications (visible to poster) */}
       {isOwnJob && applications.length > 0 && (
-        <Card className="bg-[#2A2A2E] border-[#333]">
+        <Card className="bg-card border-border">
           <CardContent className="py-4">
-            <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-3">
+            <p className="text-sm font-medium text-muted-foreground mb-3">
               Applications ({applications.length})
             </p>
             <div className="space-y-3">
@@ -482,15 +482,15 @@ export default function JobDetailPage() {
                 const decrypted = decryptApplicationMessage(app);
                 const displayMessage = decrypted ?? (app.message === '[encrypted]' ? null : app.message);
                 return (
-                  <div key={app.entityKey} className="border border-[#333] rounded-md p-3">
+                  <div key={app.entityKey} className="border border-border rounded-md p-3">
                     <div className="flex items-center justify-between mb-1">
                       <button
-                        className="text-xs text-[#FE7445] hover:underline font-mono"
+                        className="text-xs text-foreground hover:underline font-mono"
                         onClick={() => router.push(`/profile/${app.applicantWallet}`)}
                       >
                         {app.applicantWallet.slice(0, 6)}...{app.applicantWallet.slice(-4)}
                       </button>
-                      <span className="text-[10px] text-[#666]">
+                      <span className="text-[10px] text-muted-foreground">
                         {new Date(app.appliedAt).toLocaleDateString()}
                       </span>
                     </div>
@@ -499,10 +499,10 @@ export default function JobDetailPage() {
                         {decrypted && (
                           <Lock className="w-3 h-3 text-green-400 mt-0.5 shrink-0" />
                         )}
-                        <p className="text-xs text-[#A0A0A0] normal-case">{displayMessage}</p>
+                        <p className="text-xs text-muted-foreground normal-case">{displayMessage}</p>
                       </div>
                     ) : app.encryptedMessage ? (
-                      <p className="text-xs text-[#666] normal-case flex items-center gap-1.5">
+                      <p className="text-xs text-muted-foreground normal-case flex items-center gap-1.5">
                         <Lock className="w-3 h-3" />
                         Encrypted message
                       </p>
@@ -517,16 +517,16 @@ export default function JobDetailPage() {
 
       {poster && (
         <Card
-          className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+          className="bg-card border-border hover:border-foreground/30 transition-colors cursor-pointer"
           onClick={() => router.push(`/profile/${job.postedBy}`)}
         >
           <CardContent className="py-4">
-            <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-3">
+            <p className="text-sm font-medium text-muted-foreground mb-3">
               Posted by
             </p>
             <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10 shrink-0">
-                <AvatarFallback className="bg-[#FE7445]/15 text-[#FE7445] font-bold text-xs">
+                <AvatarFallback className="bg-primary/15 text-foreground text-sm font-medium">
                   {(poster.displayName || poster.username || 'U').slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -535,9 +535,9 @@ export default function JobDetailPage() {
                   {poster.displayName || poster.username}
                 </p>
                 {poster.position && (
-                  <p className="text-xs text-[#888] normal-case">
+                  <p className="text-xs text-muted-foreground normal-case">
                     {poster.position}
-                    {poster.company && <span className="text-[#666]"> at {poster.company}</span>}
+                    {poster.company && <span className="text-muted-foreground"> at {poster.company}</span>}
                   </p>
                 )}
               </div>
@@ -548,7 +548,7 @@ export default function JobDetailPage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground border border-foreground/30 text-[10px] px-1.5 py-0 "
                   >
                     {tag}
                   </Badge>
@@ -561,21 +561,21 @@ export default function JobDetailPage() {
 
       {company && (
         <Card
-          className="bg-[#2A2A2E] border-[#333] hover:border-[#FE7445]/30 transition-colors cursor-pointer"
+          className="bg-card border-border hover:border-foreground/30 transition-colors cursor-pointer"
           onClick={() => router.push(`/company/${job.postedBy}`)}
         >
           <CardContent className="py-4">
-            <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-3">
+            <p className="text-sm font-medium text-muted-foreground mb-3">
               Company
             </p>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#FE7445]/15 flex items-center justify-center shrink-0">
-                <Building2 className="w-5 h-5 text-[#FE7445]" />
+              <div className="w-10 h-10 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                <Building2 className="w-5 h-5 text-foreground" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium normal-case">{company.name}</p>
                 {company.description && (
-                  <p className="text-xs text-[#888] normal-case line-clamp-1 mt-0.5">
+                  <p className="text-xs text-muted-foreground normal-case line-clamp-1 mt-0.5">
                     {company.description}
                   </p>
                 )}
@@ -587,7 +587,7 @@ export default function JobDetailPage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] border border-[#FE7445]/30 text-[10px] px-1.5 py-0 uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground border border-foreground/30 text-[10px] px-1.5 py-0 "
                   >
                     {tag}
                   </Badge>

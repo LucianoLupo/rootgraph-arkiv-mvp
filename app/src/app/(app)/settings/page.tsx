@@ -181,9 +181,9 @@ export default function SettingsPage() {
     <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">
-          {isNewProfile ? '[ CREATE PROFILE ]' : '[ SETTINGS ]'}
+          {isNewProfile ? 'Create profile' : 'Settings'}
         </h1>
-        <p className="text-[#A0A0A0] text-xs mt-1 normal-case">
+        <p className="text-muted-foreground text-sm mt-1 normal-case">
           {isNewProfile
             ? 'Set up your on-chain identity to start building trust'
             : 'Manage your RootGraph profile'}
@@ -191,15 +191,15 @@ export default function SettingsPage() {
       </div>
 
       {isNewProfile && (
-        <Card className="bg-[#FE7445]/5 border-[#FE7445]/20">
+        <Card className="bg-primary/5 border-primary/20">
           <CardContent className="py-4">
             <div className="flex items-start gap-3">
-              <UserPlus className="w-5 h-5 text-[#FE7445] shrink-0 mt-0.5" />
+              <UserPlus className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-[#FE7445] uppercase tracking-wider">
+                <p className="text-sm font-medium text-foreground">
                   Welcome to RootGraph!
                 </p>
-                <p className="text-[10px] text-[#A0A0A0] mt-1 normal-case">
+                <p className="text-xs text-muted-foreground mt-1 normal-case">
                   Your profile will be stored on Arkiv Network — you own it
                   completely. Fill in your details to get started.
                 </p>
@@ -209,20 +209,20 @@ export default function SettingsPage() {
         </Card>
       )}
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="rounded-lg border border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xs tracking-wider">[ PROFILE INFORMATION ]</CardTitle>
+          <CardTitle className="text-sm font-medium">Profile information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           {/* Username */}
           <div className="space-y-2">
-            <Label htmlFor="username" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="username" className="text-muted-foreground text-sm font-medium">
               Username {isNewProfile && <span className="text-red-400">*</span>}
             </Label>
             <div className="relative">
               <Input
                 id="username"
-                className={`bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 pr-10 text-xs ${!isNewProfile ? 'opacity-60 cursor-not-allowed' : ''}`}
+                className={`bg-input border border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring pr-10 text-xs ${!isNewProfile ? 'opacity-60 cursor-not-allowed' : ''}`}
                 placeholder="your.username"
                 value={form.username}
                 readOnly={!isNewProfile}
@@ -235,35 +235,35 @@ export default function SettingsPage() {
                 onBlur={() => isNewProfile && checkUsername(form.username)}
               />
               {isNewProfile && usernameChecking && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#666] animate-spin" />
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
               )}
               {isNewProfile && !usernameChecking && usernameAvailable === true && (
-                <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FE7445]" />
+                <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground" />
               )}
               {isNewProfile && !usernameChecking && usernameAvailable === false && (
                 <X className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400" />
               )}
             </div>
             {isNewProfile && usernameAvailable === false && (
-              <p className="text-[10px] text-red-400 normal-case">Username is already taken</p>
+              <p className="text-xs text-red-400 normal-case">Username is already taken</p>
             )}
-            <p className="text-[10px] text-[#666] normal-case">
+            <p className="text-xs text-muted-foreground normal-case">
               {isNewProfile
                 ? 'This will be your unique identifier on the network'
                 : 'Username cannot be changed.'}
             </p>
           </div>
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-border" />
 
           {/* Display Name */}
           <div className="space-y-2">
-            <Label htmlFor="displayName" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
-              Display Name
+            <Label htmlFor="displayName" className="text-muted-foreground text-sm font-medium">
+              Display name
             </Label>
             <Input
               id="displayName"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-input border border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="Your Name"
               value={form.displayName}
               onChange={(e) => updateField('displayName', e.target.value)}
@@ -272,12 +272,12 @@ export default function SettingsPage() {
 
           {/* Position */}
           <div className="space-y-2">
-            <Label htmlFor="position" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="position" className="text-muted-foreground text-sm font-medium">
               Position
             </Label>
             <Input
               id="position"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-input border border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="e.g. Engineer, Designer, Founder"
               value={form.position}
               onChange={(e) => updateField('position', e.target.value)}
@@ -286,24 +286,24 @@ export default function SettingsPage() {
 
           {/* Company */}
           <div className="space-y-2">
-            <Label htmlFor="company" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="company" className="text-muted-foreground text-sm font-medium">
               Company
             </Label>
             <Input
               id="company"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-input border border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="e.g. Arkiv Network"
               value={form.company}
               onChange={(e) => updateField('company', e.target.value)}
             />
           </div>
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-border" />
 
           {/* Tags */}
           <div className="space-y-3">
-            <Label className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">Tags</Label>
-            <p className="text-[10px] text-[#666] normal-case">
+            <Label className="text-muted-foreground text-sm font-medium">Tags</Label>
+            <p className="text-xs text-muted-foreground normal-case">
               Select tags that describe you (visible on your profile)
             </p>
             <div className="flex flex-wrap gap-2">
@@ -313,10 +313,10 @@ export default function SettingsPage() {
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                       isSelected
-                        ? 'bg-[#FE7445]/15 text-[#FE7445] border border-[#FE7445]/30'
-                        : 'bg-[#333] text-[#A0A0A0] border border-[#444] hover:border-[#666]'
+                        ? 'bg-primary/15 text-foreground border border-primary/30'
+                        : 'bg-muted text-muted-foreground border border-border hover:border-border/60'
                     }`}
                   >
                     {tag}
@@ -330,7 +330,7 @@ export default function SettingsPage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] text-[10px] cursor-pointer hover:bg-[#FE7445]/20 uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground text-xs cursor-pointer hover:bg-primary/20"
                     onClick={() => toggleTag(tag)}
                   >
                     {tag}
@@ -345,9 +345,9 @@ export default function SettingsPage() {
 
       {/* Encryption Status */}
       {!isNewProfile && (
-        <Card className="bg-[#2A2A2E] border-[#333]">
+        <Card className="rounded-lg border border-border bg-card">
           <CardHeader>
-            <CardTitle className="text-xs tracking-wider">[ ENCRYPTION ]</CardTitle>
+            <CardTitle className="text-sm font-medium">Encryption</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
@@ -355,13 +355,13 @@ export default function SettingsPage() {
                 {isEncryptionEnabled ? (
                   <Shield className="w-5 h-5 text-green-400" />
                 ) : (
-                  <ShieldOff className="w-5 h-5 text-[#666]" />
+                  <ShieldOff className="w-5 h-5 text-muted-foreground" />
                 )}
                 <div>
                   <p className="text-xs font-medium normal-case">
                     {isEncryptionEnabled ? 'Encryption enabled' : 'Encryption disabled'}
                   </p>
-                  <p className="text-[10px] text-[#666] normal-case mt-0.5">
+                  <p className="text-xs text-muted-foreground normal-case mt-0.5">
                     {isEncryptionEnabled
                       ? 'Your messages and salary data can be encrypted'
                       : 'Sign a message to enable encrypted messaging'}
@@ -372,7 +372,7 @@ export default function SettingsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-[#FE7445]/30 text-[#FE7445] hover:bg-[#FE7445]/10 font-bold text-[10px] tracking-wider"
+                  className="border-border text-foreground hover:bg-muted text-sm font-medium"
                   onClick={handleEnableEncryption}
                   disabled={enablingEncryption}
                 >
@@ -381,16 +381,16 @@ export default function SettingsPage() {
                   ) : (
                     <Shield className="w-3 h-3 mr-1" />
                   )}
-                  ENABLE
+                  Enable
                 </Button>
               )}
             </div>
             {isEncryptionEnabled && publicKeyBase64 && (
-              <div className="bg-[#1A1A1A] rounded-md p-3 border border-[#333]">
-                <p className="text-[10px] text-[#666] uppercase tracking-wider font-bold mb-1">
-                  Public Key
+              <div className="bg-background rounded-md p-3 border border-border">
+                <p className="text-xs text-muted-foreground font-medium mb-1">
+                  Public key
                 </p>
-                <p className="text-[10px] text-[#A0A0A0] font-mono break-all">
+                <p className="text-xs text-muted-foreground font-mono break-all">
                   {publicKeyBase64}
                 </p>
               </div>
@@ -400,11 +400,11 @@ export default function SettingsPage() {
       )}
 
       <div className="flex items-center justify-between">
-        <p className="text-[10px] text-[#666] uppercase tracking-wider">
+        <p className="text-xs text-muted-foreground">
           Saved to Arkiv Network (on-chain)
         </p>
         <Button
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-8"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium px-8"
           onClick={handleSave}
           disabled={isSaving}
         >
@@ -413,7 +413,7 @@ export default function SettingsPage() {
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {isNewProfile ? 'CREATE PROFILE' : 'SAVE CHANGES'}
+          {isNewProfile ? 'Create profile' : 'Save changes'}
         </Button>
       </div>
 
@@ -422,7 +422,7 @@ export default function SettingsPage() {
           href={`https://explorer.kaolin.hoodi.arkiv.network/address/${walletAddress}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 text-[10px] text-[#666] hover:text-[#FE7445] transition-colors w-fit uppercase tracking-wider"
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-fit"
         >
           <ExternalLink className="w-3 h-3" />
           View on Arkiv Explorer

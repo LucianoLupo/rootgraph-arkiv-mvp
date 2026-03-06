@@ -132,7 +132,7 @@ export default function CompanyPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[80vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FE7445]" />
+        <Loader2 className="w-6 h-6 animate-spin text-foreground" />
       </div>
     );
   }
@@ -143,9 +143,9 @@ export default function CompanyPage() {
     <div className="p-6 lg:p-8 max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">
-          {isNew ? '[ CREATE COMPANY ]' : '[ COMPANY PROFILE ]'}
+          {isNew ? 'Create company' : 'Company profile'}
         </h1>
-        <p className="text-[#A0A0A0] text-xs mt-1 normal-case">
+        <p className="text-muted-foreground text-xs mt-1 normal-case">
           {isNew
             ? 'Set up your company profile to enhance your job listings'
             : 'Manage your on-chain company profile'}
@@ -153,15 +153,15 @@ export default function CompanyPage() {
       </div>
 
       {isNew && (
-        <Card className="bg-[#FE7445]/5 border-[#FE7445]/20">
+        <Card className="bg-primary/5 border-foreground/20">
           <CardContent className="py-4">
             <div className="flex items-start gap-3">
-              <Building2 className="w-5 h-5 text-[#FE7445] shrink-0 mt-0.5" />
+              <Building2 className="w-5 h-5 text-foreground shrink-0 mt-0.5" />
               <div>
-                <p className="text-xs font-bold text-[#FE7445] uppercase tracking-wider">
+                <p className="text-sm font-medium text-foreground">
                   Company Profile
                 </p>
-                <p className="text-[10px] text-[#A0A0A0] mt-1 normal-case">
+                <p className="text-[10px] text-muted-foreground mt-1 normal-case">
                   Create a company profile to showcase your organization. It will appear on your job listings automatically.
                 </p>
               </div>
@@ -170,18 +170,18 @@ export default function CompanyPage() {
         </Card>
       )}
 
-      <Card className="bg-[#2A2A2E] border-[#333]">
+      <Card className="rounded-lg border border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xs tracking-wider">[ COMPANY INFORMATION ]</CardTitle>
+          <CardTitle className="text-sm font-medium">Company information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="name" className="text-muted-foreground text-sm font-medium">
               Company Name <span className="text-red-400">*</span>
             </Label>
             <Input
               id="name"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="e.g. Arkiv Network"
               value={form.name}
               onChange={(e) => updateField('name', e.target.value)}
@@ -189,38 +189,38 @@ export default function CompanyPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="description" className="text-muted-foreground text-sm font-medium">
               Description
             </Label>
             <textarea
               id="description"
-              className="w-full rounded-md bg-[#1A1A1A] border border-[#333] text-white placeholder:text-[#666] text-xs p-3 min-h-[100px] resize-none focus:outline-none focus:ring-1 focus:ring-[#FE7445]/30 font-mono"
+              className="w-full rounded-md bg-background border border-border text-white placeholder:text-muted-foreground text-xs p-3 min-h-[100px] resize-none focus:outline-none focus:ring-1 focus:ring-ring font-mono"
               placeholder="Describe your company, mission, and what you do..."
               value={form.description}
               onChange={(e) => updateField('description', e.target.value)}
               maxLength={1000}
             />
-            <p className="text-[10px] text-[#666] text-right">{form.description.length}/1000</p>
+            <p className="text-[10px] text-muted-foreground text-right">{form.description.length}/1000</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="website" className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">
+            <Label htmlFor="website" className="text-muted-foreground text-sm font-medium">
               Website
             </Label>
             <Input
               id="website"
-              className="bg-[#1A1A1A] border-[#333] text-white placeholder:text-[#666] focus-visible:ring-[#FE7445]/30 text-xs"
+              className="bg-background border-border text-white placeholder:text-muted-foreground focus-visible:ring-ring text-xs"
               placeholder="https://yourcompany.com"
               value={form.website}
               onChange={(e) => updateField('website', e.target.value)}
             />
           </div>
 
-          <div className="h-px bg-[#333]" />
+          <div className="h-px bg-muted" />
 
           <div className="space-y-3">
-            <Label className="text-[#A0A0A0] text-xs font-bold uppercase tracking-wider">Tags</Label>
-            <p className="text-[10px] text-[#666] normal-case">
+            <Label className="text-muted-foreground text-sm font-medium">Tags</Label>
+            <p className="text-[10px] text-muted-foreground normal-case">
               Select tags that describe your company
             </p>
             <div className="flex flex-wrap gap-2">
@@ -230,10 +230,10 @@ export default function CompanyPage() {
                   <button
                     key={tag}
                     onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold tracking-wider uppercase transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                       isSelected
-                        ? 'bg-[#FE7445]/15 text-[#FE7445] border border-[#FE7445]/30'
-                        : 'bg-[#333] text-[#A0A0A0] border border-[#444] hover:border-[#666]'
+                        ? 'bg-primary/15 text-foreground border border-foreground/30'
+                        : 'bg-muted text-muted-foreground border border-border hover:border-muted-foreground'
                     }`}
                   >
                     {tag}
@@ -247,7 +247,7 @@ export default function CompanyPage() {
                   <Badge
                     key={tag}
                     variant="secondary"
-                    className="bg-[#FE7445]/10 text-[#FE7445] text-[10px] cursor-pointer hover:bg-[#FE7445]/20 uppercase tracking-wider"
+                    className="bg-primary/10 text-foreground text-[10px] cursor-pointer hover:bg-primary/20 "
                     onClick={() => toggleTag(tag)}
                   >
                     {tag}
@@ -261,11 +261,11 @@ export default function CompanyPage() {
       </Card>
 
       <div className="flex items-center justify-between">
-        <p className="text-[10px] text-[#666] uppercase tracking-wider">
+        <p className="text-sm font-medium text-muted-foreground">
           Saved to Arkiv Network (on-chain)
         </p>
         <Button
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-8"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium px-8"
           onClick={handleSave}
           disabled={saving || !form.name.trim()}
         >
@@ -274,7 +274,7 @@ export default function CompanyPage() {
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {isNew ? 'CREATE COMPANY' : 'SAVE CHANGES'}
+          {isNew ? 'Create company' : 'Save changes'}
         </Button>
       </div>
 

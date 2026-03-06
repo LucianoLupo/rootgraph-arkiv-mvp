@@ -16,34 +16,34 @@ import {
 const features = [
   {
     icon: Briefcase,
-    label: 'ON-CHAIN JOB BOARD',
+    label: 'On-Chain Job Board',
     description:
       'Post and discover jobs stored as Arkiv entities. Listings are transparent and censorship-resistant.',
   },
   {
     icon: Shield,
-    label: 'TRUST-BASED HIRING',
+    label: 'Trust-Based Hiring',
     description:
       'Hire from your trust network. Connections are verified by cryptographic proofs.',
   },
   {
     icon: Database,
-    label: 'DECENTRALIZED PROFILES',
+    label: 'Decentralized Profiles',
     description:
       'Your professional identity lives on-chain. You own it completely.',
   },
   {
     icon: Globe,
-    label: 'PORTABLE REPUTATION',
+    label: 'Portable Reputation',
     description:
       'Your trust graph is composable. Other apps can read your data from Arkiv.',
   },
 ];
 
 const steps = [
-  { num: '01', title: 'CONNECT WALLET', desc: 'Link your wallet or sign in with Google to create your on-chain professional identity.' },
-  { num: '02', title: 'POST & DISCOVER JOBS', desc: 'Browse the on-chain job board or post listings. Express interest directly from your wallet.' },
-  { num: '03', title: 'BUILD YOUR TRUST GRAPH', desc: 'Connect with professionals. Your network and reputation are permanent and portable.' },
+  { num: '01', title: 'Connect Wallet', desc: 'Link your wallet or sign in with Google to create your on-chain professional identity.' },
+  { num: '02', title: 'Post & Discover Jobs', desc: 'Browse the on-chain job board or post listings. Express interest directly from your wallet.' },
+  { num: '03', title: 'Build Your Trust Graph', desc: 'Connect with professionals. Your network and reputation are permanent and portable.' },
 ];
 
 export default function LandingPage() {
@@ -62,21 +62,21 @@ export default function LandingPage() {
   }, [ready, authenticated, router]);
 
   return (
-    <div className="min-h-screen bg-[#1A1A1A] text-white">
+    <div className="min-h-screen bg-background text-white">
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-        <span className="text-lg font-bold tracking-wider text-[#FE7445]">
+        <span className="text-lg font-bold text-foreground">
           [ ROOTGRAPH ]
         </span>
-        <div className="hidden sm:flex items-center gap-8 text-xs font-bold tracking-wider text-[#A0A0A0]">
-          <span className="hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/jobs')}>JOB BOARD</span>
+        <div className="hidden sm:flex items-center gap-8 text-sm font-medium text-muted-foreground">
+          <span className="hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/jobs')}>Job Board</span>
         </div>
         <Button
           size="sm"
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider rounded-lg"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs rounded-lg"
           onClick={login}
         >
-          CONNECT WALLET
+          Connect Wallet
         </Button>
       </nav>
 
@@ -85,20 +85,20 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Left: Hero Text */}
           <div>
-            <div className="inline-block mb-6 px-3 py-1 rounded-full bg-[#FE7445]/10 border border-[#FE7445]/30">
-              <span className="text-[10px] font-bold tracking-wider text-[#FE7445] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FE7445]" />
-                LIVE ON ARKIV TESTNET
+            <div className="inline-block mb-6 px-3 py-1 rounded-full bg-muted border border-border">
+              <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-foreground" />
+                Live on Arkiv Testnet
               </span>
             </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6">
               THE{' '}
-              <span className="text-[#FE7445]">ON-CHAIN</span>{' '}
+              <span className="text-foreground">ON-CHAIN</span>{' '}
               JOB BOARD
             </h1>
 
-            <p className="text-base text-[#A0A0A0] max-w-lg mb-10 leading-relaxed font-mono">
+            <p className="text-base text-muted-foreground max-w-lg mb-10 leading-relaxed">
               Post jobs, hire from your trust network, and build a portable
               professional reputation — all on the Arkiv Network.
             </p>
@@ -106,20 +106,20 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 size="lg"
-                className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-8 py-6 rounded-lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs px-8 py-6 rounded-lg"
                 onClick={login}
               >
                 <Wallet className="w-4 h-4 mr-2" />
-                GET STARTED
+                Get Started
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="border-[#333] text-[#A0A0A0] hover:bg-[#2A2A2E] hover:text-white font-bold text-xs tracking-wider px-8 py-6 rounded-lg"
+                className="border-border text-muted-foreground hover:bg-muted hover:text-foreground font-bold text-xs px-8 py-6 rounded-lg"
                 onClick={() => router.push('/jobs')}
               >
                 <Briefcase className="w-4 h-4 mr-2" />
-                BROWSE JOBS
+                Browse Jobs
               </Button>
             </div>
           </div>
@@ -129,12 +129,12 @@ export default function LandingPage() {
             {features.map((f) => (
               <div
                 key={f.label}
-                className="flex items-center gap-4 p-4 rounded-lg bg-[#2A2A2E] border border-[#333] hover:border-[#FE7445]/30 transition-colors"
+                className="flex items-center gap-4 p-4 rounded-lg bg-card border border-border hover:border-border transition-colors"
               >
-                <div className="w-10 h-10 rounded-lg bg-[#FE7445]/10 flex items-center justify-center shrink-0">
-                  <f.icon className="w-5 h-5 text-[#FE7445]" />
+                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                  <f.icon className="w-5 h-5 text-foreground" />
                 </div>
-                <span className="text-xs font-bold tracking-wider">{f.label}</span>
+                <span className="text-sm font-medium">{f.label}</span>
               </div>
             ))}
           </div>
@@ -143,14 +143,14 @@ export default function LandingPage() {
 
       {/* Graph Preview */}
       <section className="px-6 py-16 max-w-5xl mx-auto">
-        <div className="rounded-xl border border-[#333] bg-[#2A2A2E] overflow-hidden">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
           <div className="aspect-video flex items-center justify-center relative">
             <GraphPreview />
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-              <span className="text-[10px] text-[#666] uppercase tracking-wider font-bold">
+              <span className="text-[10px] text-muted-foreground font-medium">
                 Interactive Trust Map Preview
               </span>
-              <span className="text-[10px] text-[#666] uppercase tracking-wider font-bold px-2 py-1 border border-[#444] rounded">
+              <span className="text-[10px] text-muted-foreground font-medium px-2 py-1 border border-border rounded">
                 Live Visualization
               </span>
             </div>
@@ -161,20 +161,20 @@ export default function LandingPage() {
       {/* How It Works */}
       <section className="px-6 py-20 max-w-6xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-center">
-          [ HOW IT WORKS ]
+          [ How It Works ]
         </h2>
-        <p className="text-[#A0A0A0] text-center max-w-xl mx-auto mb-16 text-sm">
+        <p className="text-muted-foreground text-center max-w-xl mx-auto mb-16 text-sm">
           Three steps to own your professional network on-chain.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step) => (
             <div key={step.num} className="text-center">
-              <span className="text-5xl font-bold text-[#FE7445] block mb-4">
+              <span className="text-5xl font-bold text-foreground block mb-4">
                 {step.num}
               </span>
-              <h3 className="text-base font-bold tracking-wider mb-2">{step.title}</h3>
-              <p className="text-sm text-[#A0A0A0]">{step.desc}</p>
+              <h3 className="text-base font-bold mb-2">{step.title}</h3>
+              <p className="text-sm text-muted-foreground">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -183,9 +183,9 @@ export default function LandingPage() {
       {/* Features Grid */}
       <section className="px-6 py-20 max-w-6xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-center">
-          [ TRUST, DECENTRALIZED ]
+          [ Trust, Decentralized ]
         </h2>
-        <p className="text-[#A0A0A0] text-center max-w-xl mx-auto mb-16 text-sm">
+        <p className="text-muted-foreground text-center max-w-xl mx-auto mb-16 text-sm">
           RootGraph reimagines professional networking with on-chain data
           ownership and verifiable trust connections.
         </p>
@@ -194,13 +194,13 @@ export default function LandingPage() {
           {features.map((f) => (
             <div
               key={f.label}
-              className="group p-6 rounded-xl border border-[#333] bg-[#2A2A2E] hover:border-[#FE7445]/30 transition-all"
+              className="group p-6 rounded-xl border border-border bg-card hover:border-border transition-all"
             >
-              <div className="w-12 h-12 rounded-lg bg-[#FE7445]/10 flex items-center justify-center mb-4 group-hover:bg-[#FE7445]/20 transition-colors">
-                <f.icon className="w-6 h-6 text-[#FE7445]" />
+              <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-4 group-hover:bg-muted transition-colors">
+                <f.icon className="w-6 h-6 text-foreground" />
               </div>
-              <h3 className="text-xs font-bold tracking-wider mb-2">{f.label}</h3>
-              <p className="text-xs text-[#A0A0A0] leading-relaxed normal-case">
+              <h3 className="text-sm font-medium mb-2">{f.label}</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed normal-case">
                 {f.description}
               </p>
             </div>
@@ -210,31 +210,31 @@ export default function LandingPage() {
 
       {/* Built on Arkiv */}
       <section className="px-6 py-20 max-w-4xl mx-auto">
-        <div className="rounded-xl border border-[#333] bg-[#2A2A2E] p-8 sm:p-12 text-center">
-          <span className="text-[10px] font-bold tracking-wider text-[#FE7445] block mb-4">
-            [ INFRASTRUCTURE ]
+        <div className="rounded-xl border border-border bg-card p-8 sm:p-12 text-center">
+          <span className="text-[10px] font-medium text-muted-foreground block mb-4">
+            [ Infrastructure ]
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-            BUILT ON{' '}
-            <span className="text-[#FE7445]">ARKIV NETWORK</span>
+            Built on{' '}
+            <span className="text-foreground">Arkiv Network</span>
           </h2>
-          <p className="text-[#A0A0A0] max-w-xl mx-auto mb-8 leading-relaxed text-sm normal-case">
+          <p className="text-muted-foreground max-w-xl mx-auto mb-8 leading-relaxed text-sm normal-case">
             Arkiv is a decentralized data layer that makes blockchain data
             composable and accessible. RootGraph stores all profiles and
             connections as Arkiv entities.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#444] text-[#A0A0A0]">
-              <span className="w-2 h-2 rounded-full bg-[#FE7445] animate-pulse" />
-              ARKIV TESTNET (KAOLIN)
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-foreground animate-pulse" />
+              Arkiv Testnet (Kaolin)
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#444] text-[#A0A0A0]">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-muted-foreground">
               <Shield className="w-3.5 h-3.5" />
-              ON-CHAIN STORAGE
+              On-Chain Storage
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#1A1A1A] border border-[#444] text-[#A0A0A0]">
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-background border border-border text-muted-foreground">
               <Globe className="w-3.5 h-3.5" />
-              DECENTRALIZED
+              Decentralized
             </div>
           </div>
         </div>
@@ -243,27 +243,27 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="px-6 py-20 max-w-4xl mx-auto text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-          READY TO OWN YOUR NETWORK?
+          Ready to Own Your Network?
         </h2>
-        <p className="text-[#A0A0A0] mb-8 max-w-lg mx-auto text-sm normal-case">
+        <p className="text-muted-foreground mb-8 max-w-lg mx-auto text-sm normal-case">
           Join the decentralized professional graph. Connect your wallet and
           start building trust on-chain.
         </p>
         <Button
           size="lg"
-          className="bg-[#FE7445] hover:bg-[#e5673d] text-[#1A1A1A] font-bold text-xs tracking-wider px-8 py-6 rounded-lg"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xs px-8 py-6 rounded-lg"
           onClick={login}
         >
-          GET STARTED
+          Get Started
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#333] bg-[#1A1A1A] px-6 py-8">
+      <footer className="border-t border-border bg-background px-6 py-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-bold tracking-wider text-white">
+            <span className="text-sm font-bold text-white">
               [ ROOTGRAPH ]
             </span>
             <span className="text-xs text-white/40">x</span>
@@ -301,7 +301,7 @@ function GraphPreview() {
     <svg
       viewBox="0 0 100 100"
       className="w-full h-full opacity-60"
-      style={{ filter: 'drop-shadow(0 0 8px rgba(254, 116, 69, 0.2))' }}
+      style={{ filter: 'drop-shadow(0 0 8px rgba(243, 243, 246, 0.15))' }}
     >
       {edges.map(([from, to], i) => (
         <line
@@ -310,7 +310,7 @@ function GraphPreview() {
           y1={nodes[from].y}
           x2={nodes[to].x}
           y2={nodes[to].y}
-          stroke="#FE7445"
+          stroke="#f3f3f6"
           strokeWidth="0.3"
           opacity="0.3"
         />
@@ -321,8 +321,8 @@ function GraphPreview() {
             cx={n.x}
             cy={n.y}
             r={n.size / 2}
-            fill={n.primary ? '#FE7445' : '#2A2A2E'}
-            stroke={n.primary ? '#FE7445' : '#444'}
+            fill={n.primary ? '#f3f3f6' : '#1c1c21'}
+            stroke={n.primary ? '#f3f3f6' : '#26262c'}
             strokeWidth={n.primary ? '0.5' : '0.3'}
             opacity={n.primary ? 1 : 0.6}
           />
@@ -332,7 +332,7 @@ function GraphPreview() {
               cy={n.y}
               r={n.size / 2 + 2}
               fill="none"
-              stroke="#FE7445"
+              stroke="#f3f3f6"
               strokeWidth="0.2"
               opacity="0.3"
             >
